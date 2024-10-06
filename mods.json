@@ -1,0 +1,29 @@
+[
+  {
+    "name": "Brita's Weapon Pack",
+    "workshopID": "2200148440",
+    "modID": "",
+    "mapFolder": "",
+    "requirements": "",
+    "source": "https://steamcommunity.com/sharedfiles/filedetails/?id=2200148440",
+    "enabled": true
+  },
+  {
+    "name": "Louisville Shipping Port",
+    "workshopID": "3149613879",
+    "modID": "SimonMDLVHarbor",
+    "mapFolder": "lvharbor",
+    "requirements": "",
+    "source": "https://steamcommunity.com/sharedfiles/filedetails/?id=3149613879",
+    "enabled": true
+  },
+  {
+    "name": "10 Years Later - LV International Airport",
+    "workshopID": "",
+    "modID": "",
+    "mapFolder": "",
+    "requirements": "",
+    "source": "https://steamcommunity.com/sharedfiles/filedetails/?id=3327422424&searchtext=3045726312",
+    "enabled": true
+  }
+]
