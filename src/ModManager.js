@@ -38,10 +38,12 @@ const ModManager = () => {
         }
     };
 
-    const saveModsToFile = async () => {
+    const saveModsToFile = async (filePath) => {
+        const fs = window.require('fs');
+    
         try {
-            const { filePath } = await ipcRenderer.invoke('dialog:saveFile');
             if (filePath) {
+                // Save mods to the selected file path
                 await ipcRenderer.invoke('save-mods-custom', mods, filePath);
             }
         } catch (error) {
