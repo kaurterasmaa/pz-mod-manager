@@ -60,34 +60,37 @@ To run the application in development mode, follow these steps:
    This opens the Electron desktop window where the app will run.
 
 The app should now be working, and you can interact with mods through the UI in the Electron window.
+
+
+## Building for Production
 ```
-
-
-________________________________________________________________________________
-Building for Production
 
 To create a production build, run:
 
-    bash
-    npm run build
+```bash
+npm run build
+```
 
-This command will generate a dist directory containing the following files:
-    • index.html: The main entry point for your application.
-    • bundle.js: The compiled JavaScript code.
-    • bundle.js.LICENSE.txt: A file containing license information for dependencies.
-    
-Running in Electron
+This command will generate a `dist` directory containing the following files:
 
-To run the application in Electron:
-    1. Ensure you have built the application using npm run build.
-    2. Update your main.js to load the production files:
-       javascript
-       const path = require('path');
-       mainWindow.loadFile(path.join(__dirname, 'dist', 'index.html'));
-    3. Start your Electron app.
+- `index.html`: The main entry point for your application.
+- `bundle.js`: The compiled JavaScript code.
+- `bundle.js.LICENSE.txt`: A file containing license information for dependencies.
 
-_______________________________________________________________________________
+### Running in Electron
 
+To run the application in Electron for production:
+
+1. Ensure you have built the application using `npm run build`.
+2. Update your `main.js` to load the production files:
+
+   ```javascript
+   const path = require('path');
+   mainWindow.loadFile(path.join(__dirname, 'dist', 'index.html'));
+   ```
+
+3. Start your Electron app.
+```
 
 
 
@@ -117,16 +120,3 @@ Commands Summary
     • Start Node.js backend: npm run server
     • Run Electron app: npm run electron
     • Build Electron executable: npx electron-packager . mod-manager --platform=win32 --arch=x64
-________________________________________________________________________________________________________________________
-
-Frontend:
-
-    npm start
-
-Backend:
-
-    npm run server
-
-Electron:
-    
-    npm run electron
