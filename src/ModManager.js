@@ -26,9 +26,8 @@ const ModManager = () => {
         setEditIndex(index);
     };
 
-    const loadModsFromFile = async () => {
+    const loadModsFromFile = async (filePath) => {
         try {
-            const { filePath } = await ipcRenderer.invoke('dialog:openFile');
             if (filePath) {
                 const modsList = await ipcRenderer.invoke('load-mods-custom', filePath);
                 setMods(modsList);
@@ -39,11 +38,8 @@ const ModManager = () => {
     };
 
     const saveModsToFile = async (filePath) => {
-        const fs = window.require('fs');
-    
         try {
             if (filePath) {
-                // Save mods to the selected file path
                 await ipcRenderer.invoke('save-mods-custom', mods, filePath);
             }
         } catch (error) {
