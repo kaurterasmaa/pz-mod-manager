@@ -63,7 +63,6 @@ The app should now be working, and you can interact with mods through the UI in 
 
 
 ## Building for Production
-```
 
 To create a production build, run:
 
