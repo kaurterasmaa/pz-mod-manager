@@ -26,6 +26,7 @@ const ModManager = () => {
         setEditIndex(index);
     };
 
+    // Load mods from JSON
     const loadModsFromFile = async (filePath) => {
         try {
             if (filePath) {
@@ -37,6 +38,7 @@ const ModManager = () => {
         }
     };
 
+    // Save mods to JSON
     const saveModsToFile = async (filePath) => {
         try {
             if (filePath) {
@@ -44,6 +46,31 @@ const ModManager = () => {
             }
         } catch (error) {
             console.error('Error saving mods to file:', error);
+        }
+    };
+
+    // Load mods from INI
+    const loadModsFromIniFile = async (filePath) => {
+        try {
+            if (filePath) {
+                const workshopIDs = await ipcRenderer.invoke('load-mods-ini', filePath);
+                const iniModsList = workshopIDs.map((id) => ({ workshopID: id, modName: `Mod-${id}` }));
+                setMods(iniModsList);
+            }
+        } catch (error) {
+            console.error('Error loading mods from INI file:', error);
+        }
+    };
+
+    // Save mods to INI
+    const saveModsToIniFile = async (filePath) => {
+        try {
+            if (filePath) {
+                const workshopIDs = mods.map(mod => mod.workshopID);
+                await ipcRenderer.invoke('save-mods-ini', workshopIDs, filePath);
+            }
+        } catch (error) {
+            console.error('Error saving mods to INI file:', error);
         }
     };
 
@@ -79,6 +106,8 @@ const ModManager = () => {
             <FileOperations
                 loadModsFromFile={loadModsFromFile}
                 saveModsToFile={saveModsToFile}
+                loadModsFromIniFile={loadModsFromIniFile}   // New INI load function
+                saveModsToIniFile={saveModsToIniFile}       // New INI save function
             />
         </div>
     );
