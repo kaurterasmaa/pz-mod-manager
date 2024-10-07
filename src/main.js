@@ -1,93 +1,62 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
-const { loadModsJson, saveModsJson } = require('./jsonHandler');  // Import JSON handler
-const { loadModsIni, saveModsIni } = require('./iniHandler');  // Import INI handler
+const { loadModsJson, saveModsJson } = require('./jsonHandler');
+const { loadModsIni, saveModsIni } = require('./iniHandler');
 
 let mainWindow;
 
 // JSON Handling
 ipcMain.handle('load-mods-custom', async (_, filePath) => {
-    try {
-        return await loadModsJson(filePath);
-    } catch (error) {
-        console.error('Error loading JSON mods:', error);
-        throw error;
-    }
+    return loadModsJson(filePath);
 });
 
 ipcMain.handle('save-mods-custom', async (_, modList, filePath) => {
-    try {
-        return await saveModsJson(modList, filePath);
-    } catch (error) {
-        console.error('Error saving JSON mods:', error);
-        throw error;
+    return saveModsJson(modList, filePath);
+});
+
+ipcMain.handle('dialog:openJsonFile', async () => {  // For loading .json files
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+        properties: ['openFile'],
+        filters: [{ name: 'JSON', extensions: ['json'] }],
+    });
+    if (!canceled) {
+        return { filePath: filePaths[0] };
+    }
+});
+
+ipcMain.handle('dialog:saveJsonFile', async () => {  // For saving .json files
+    const { canceled, filePath } = await dialog.showSaveDialog({
+        filters: [{ name: 'JSON', extensions: ['json'] }],
+    });
+    if (!canceled) {
+        return { filePath };
     }
 });
 
 // INI Handling
 ipcMain.handle('load-mods-ini', async (_, filePath) => {
-    try {
-        return await loadModsIni(filePath);
-    } catch (error) {
-        console.error('Error loading INI mods:', error);
-        throw error;
-    }
+    return loadModsIni(filePath);
 });
 
 ipcMain.handle('save-mods-ini', async (_, workshopIDs, filePath) => {
-    try {
-        return await saveModsIni(workshopIDs, filePath);
-    } catch (error) {
-        console.error('Error saving INI mods:', error);
-        throw error;
+    return saveModsIni(workshopIDs, filePath);
+});
+
+ipcMain.handle('dialog:openIniFile', async () => {  // For loading .ini files
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+        properties: ['openFile'],
+        filters: [{ name: 'INI', extensions: ['ini'] }],
+    });
+    if (!canceled) {
+        return { filePath: filePaths[0] };
     }
 });
 
-// Open file dialog (for both .json and .ini files)
-ipcMain.handle('dialog:openFile', async () => {
-    try {
-        const { canceled, filePaths } = await dialog.showOpenDialog({
-            properties: ['openFile'],
-            filters: [
-                { name: 'JSON and INI Files', extensions: ['json', 'ini'] },
-                { name: 'All Files', extensions: ['*'] }
-            ]
-        });
-        if (!canceled && filePaths.length > 0) {
-            return { filePath: filePaths[0] };
-        }
-    } catch (error) {
-        console.error('Error opening file dialog:', error);
-        throw error;
-    }
-});
-
-// Save to JSON file only
-ipcMain.handle('dialog:saveJsonFile', async () => {
-    try {
-        const { canceled, filePath } = await dialog.showSaveDialog({
-            filters: [{ name: 'JSON Files', extensions: ['json'] }],
-        });
-        if (!canceled && filePath) {
-            return { filePath };
-        }
-    } catch (error) {
-        console.error('Error saving JSON file dialog:', error);
-        throw error;
-    }
-});
-
-// Save to INI file only
-ipcMain.handle('dialog:saveIniFile', async () => {
-    try {
-        const { canceled, filePath } = await dialog.showSaveDialog({
-            filters: [{ name: 'INI Files', extensions: ['ini'] }],
-        });
-        if (!canceled && filePath) {
-            return { filePath };
-        }
-    } catch (error) {
-        console.error('Error saving INI file dialog:', error);
-        throw error;
+ipcMain.handle('dialog:saveIniFile', async () => {  // For saving .ini files
+    const { canceled, filePath } = await dialog.showSaveDialog({
+        filters: [{ name: 'INI', extensions: ['ini'] }],
+    });
+    if (!canceled) {
+        return { filePath };
     }
 });
 

@@ -30,13 +30,7 @@ const FileOperations = ({ loadModsFromFile, saveModsToFile, loadModsFromIniFile,
     const handleLoadModsFromJsonFile = async () => {
         try {
             ensureSaveFolderExists(); // Ensure the folder exists before dialog opens
-            const { filePath } = await ipcRenderer.invoke('dialog:openFile', {
-                defaultPath: defaultSaveFolder,
-                filters: [
-                    { name: 'JSON Files', extensions: ['json'] },
-                    { name: 'All Files', extensions: ['*'] }
-                ]
-            });
+            const { filePath } = await ipcRenderer.invoke('dialog:openJsonFile'); // Exclusively load .json
 
             if (filePath) {
                 await loadModsFromFile(filePath); // Pass the selected file path to load function
@@ -64,13 +58,7 @@ const FileOperations = ({ loadModsFromFile, saveModsToFile, loadModsFromIniFile,
     const handleLoadModsFromIniFile = async () => {
         try {
             ensureSaveFolderExists();
-            const { filePath } = await ipcRenderer.invoke('dialog:openFile', {
-                defaultPath: defaultSaveFolder,
-                filters: [
-                    { name: 'INI Files', extensions: ['ini'] },
-                    { name: 'All Files', extensions: ['*'] }
-                ]
-            });
+            const { filePath } = await ipcRenderer.invoke('dialog:openIniFile'); // Exclusively load .ini
 
             if (filePath) {
                 await loadModsFromIniFile(filePath); // Pass the selected file path to load function
@@ -87,8 +75,8 @@ const FileOperations = ({ loadModsFromFile, saveModsToFile, loadModsFromIniFile,
             <button onClick={handleLoadModsFromJsonFile}>Load Mods from JSON File</button>
             <button onClick={handleSaveModsToJsonFile}>Save Mods to JSON File</button>
 
-            <button onClick={handleLoadModsFromIniFile}>Load Mods from INI File</button>
-            <button onClick={handleSaveModsToIniFile}>Save Mods to INI File</button>
+            <button onClick={handleLoadModsFromIniFile}>Load Mods from INI File</button> {/* Button for INI load */}
+            <button onClick={handleSaveModsToIniFile}>Save Mods to INI File</button>   {/* Button for INI save */}
         </div>
     );
 };
