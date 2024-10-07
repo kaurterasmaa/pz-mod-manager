@@ -1,51 +1,67 @@
-Mod Manager
+# Mod Manager
 
 A simple desktop application to manage mods for a game server. This app allows you to add and remove mods from a settings file using a graphical interface built with React, Node.js, and Electron.
-Features:
 
-    • List available mods with names and links to their info.
-    • Add mods to the server settings file.
-    • Remove mods from the server settings file.
-    
-Requirements:
+## Features
 
-    • Node.js
-    • npm
-    • Webpack, Babel, and Electron (handled by the setup).
+- List available mods with names and links to their info.
+- Add mods to the server settings file.
+- Remove mods from the server settings file.
 
-Getting Started
+## Requirements
 
-Step 1: Clone the Repository
+- Node.js
+- npm
+- Webpack, Babel, and Electron (handled by the setup).
+
+## Getting Started
+
+### Step 1: Clone the Repository
+
 Clone the project from your version control (or set up a new folder if not using Git).
-bash
-Copy code
+
+```bash
 git clone <repository-url>
 cd mod-manager
+```
 
-Step 2: Install Dependencies
+### Step 2: Install Dependencies
+
 Install all necessary Node.js packages by running the following command:
 
-bash
-
+```bash
 npm install
+```
+
 This installs React, Webpack, Babel, Electron, and Express.
 
-Step 3: Development Setup
-To run the application in development mode, you need to open three terminal windows:
+### Step 3: Development Setup
 
-    1. Start the React Frontend:
-       bash
-       npm run start
-       This runs Webpack Dev Server and serves the React app on http://localhost:3000.
-    2. Start the Node.js Backend:
-       bash
-       npm run server
-       This runs the Express server which handles requests for adding/removing mods on http://localhost:3001.
-    3. Run the Electron App (next step ‘Building for Production’ needs to be done before):
-       bash
-       npm run electron
-       This opens the Electron desktop window where the app will run.
-The app should now be working, and you can interact with the mods through the UI in the Electron window.
+To run the application in development mode, follow these steps:
+
+1. **Start the React Frontend:**
+   ```bash
+   npm run start
+   ```
+   This runs Webpack Dev Server and serves the React app on `http://localhost:3000`.
+
+2. **Start the Node.js Backend:**
+   ```bash
+   npm run server
+   ```
+   This runs the Express server, which handles requests for adding/removing mods, on `http://localhost:3001`.
+
+3. **Run the Electron App:**
+   Make sure you've completed the "Building for Production" step before running this.
+
+   ```bash
+   npm run electron
+   ```
+   This opens the Electron desktop window where the app will run.
+
+The app should now be working, and you can interact with mods through the UI in the Electron window.
+```
+
 
 ________________________________________________________________________________
 Building for Production
