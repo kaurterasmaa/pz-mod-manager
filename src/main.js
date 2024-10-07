@@ -1,31 +1,16 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
-const fs = require('fs');
-const path = require('path');
+const { loadModsJson, saveModsJson } = require('./jsonHandler');  // Import JSON handler
+const { loadModsIni, saveModsIni } = require('./iniHandler');  // Import INI handler
 
 let mainWindow;
 
+// JSON Handling
 ipcMain.handle('load-mods-custom', async (_, filePath) => {
-    return new Promise((resolve, reject) => {
-        fs.readFile(filePath, 'utf-8', (err, data) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(JSON.parse(data));
-            }
-        });
-    });
+    return loadModsJson(filePath);
 });
 
 ipcMain.handle('save-mods-custom', async (_, modList, filePath) => {
-    return new Promise((resolve, reject) => {
-        fs.writeFile(filePath, JSON.stringify(modList, null, 2), (err) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve();
-            }
-        });
-    });
+    return saveModsJson(modList, filePath);
 });
 
 ipcMain.handle('dialog:openFile', async () => {
@@ -47,6 +32,33 @@ ipcMain.handle('dialog:saveFile', async () => {
     }
 });
 
+// INI Handling
+ipcMain.handle('load-mods-ini', async (_, filePath) => {
+    return loadModsIni(filePath);
+});
+
+ipcMain.handle('save-mods-ini', async (_, workshopIDs, filePath) => {
+    return saveModsIni(workshopIDs, filePath);
+});
+
+ipcMain.handle('dialog:openIniFile', async () => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+        properties: ['openFile'],
+        filters: [{ name: 'INI', extensions: ['ini'] }],
+    });
+    if (!canceled) {
+        return { filePath: filePaths[0] };
+    }
+});
+
+ipcMain.handle('dialog:saveIniFile', async () => {
+    const { canceled, filePath } = await dialog.showSaveDialog({
+        filters: [{ name: 'INI', extensions: ['ini'] }],
+    });
+    if (!canceled) {
+        return { filePath };
+    }
+});
 
 function createWindow() {
     mainWindow = new BrowserWindow({
