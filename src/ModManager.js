@@ -1,10 +1,11 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { ModContext } from './ModContext';
 import { ipcRenderer } from 'electron';
 import useModDataModel from './ModDataModel';
 import ModForm from './ModForm';
 import ModList from './ModList';
 import FileOperations from './FileOperations';
+import Scraper from './Scraper';
 
 const ModManager = () => {
     const { mods, addOrEditMod, removeMod, setMods } = useContext(ModContext);
@@ -13,6 +14,8 @@ const ModManager = () => {
         requirements, setRequirements, modSource, setModSource, modEnabled, setModEnabled,
         editIndex, setEditIndex, resetFields, getMod, setMod,
     } = useModDataModel();
+
+    const [showScraper, setShowScraper] = useState(false); // State to control Scraper visibility
 
     const handleAddOrEditMod = () => {
         const newMod = getMod();
@@ -29,9 +32,9 @@ const ModManager = () => {
     const loadModsFromFile = async (filePath) => {
         try {
             if (filePath) {
-                setMods([]); // Clear the current mod list
+                setMods([]);
                 const modsList = await ipcRenderer.invoke('load-mods-custom', filePath);
-                setMods(modsList); // Load new mods
+                setMods(modsList);
             }
         } catch (error) {
             console.error('Error loading mods from file:', error);
@@ -54,7 +57,7 @@ const ModManager = () => {
                 setMods([]); // Clear the current mod list
                 const workshopIDs = await ipcRenderer.invoke('load-mods-ini', filePath);
                 const iniModsList = workshopIDs.map((id) => ({ workshopID: id, modName: `Mod-${id}` }));
-                setMods(iniModsList); // Load new mods from INI
+                setMods(iniModsList);
             }
         } catch (error) {
             console.error('Error loading mods from INI file:', error);
@@ -72,16 +75,14 @@ const ModManager = () => {
         }
     };
 
-    // Clear mods manually
     const clearMods = () => {
-        setMods([]); // Clear the current mod list manually
+        setMods([]);
     };
 
     return (
         <div>
             <h1>Mod Manager</h1>
 
-            {/* Mod Counter */}
             <p>Number of Mods Loaded: {mods.length}</p>
 
             <ModForm
@@ -116,8 +117,13 @@ const ModManager = () => {
                 saveModsToIniFile={saveModsToIniFile}
             />
 
-            {/* Button to clear mods manually */}
             <button onClick={clearMods}>Clear Mods List</button>
+
+            <button onClick={() => setShowScraper(!showScraper)}>
+                {showScraper ? 'Hide Scraper' : 'Show Scraper'}
+            </button>
+
+            {showScraper && <Scraper />} {/* Conditional rendering of the Scraper component */}
         </div>
     );
 };

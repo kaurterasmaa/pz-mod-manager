@@ -15,7 +15,6 @@ ipcMain.handle('save-mods-custom', async (_, modList, filePath) => {
 
 // Add the handler for saving mods
 ipcMain.handle('save-mods', async (_, modList) => {
-   // const filePath = 'path_to_your_mods_file.json'; // Specify the appropriate path for saving
     try {
         await saveModsJson(modList, filePath);
         return true; // Indicate success
@@ -70,6 +69,42 @@ ipcMain.handle('dialog:saveIniFile', async () => {
     });
     if (!canceled) {
         return { filePath };
+    }
+});
+
+// Scraping Handler
+const scrapeSteamWorkshopPage = async (workshopID) => {
+    const scrapeWindow = new BrowserWindow({
+        show: false, // Invisible window for scraping
+        webPreferences: {
+            contextIsolation: false,
+            nodeIntegration: true,
+        },
+    });
+
+    const url = `https://steamcommunity.com/sharedfiles/filedetails/?id=${workshopID}`;
+    await scrapeWindow.loadURL(url);
+
+    const data = await scrapeWindow.webContents.executeJavaScript(`
+        (function() {
+            const title = document.querySelector('.workshopItemTitle')?.innerText || 'No title found';
+            const description = document.querySelector('.workshopItemDescription')?.innerText || 'No description found';
+            return { title, description };
+        })();
+    `);
+
+    scrapeWindow.close();
+    return data;
+};
+
+// IPC handler for scraping
+ipcMain.handle('scrape-steam-page', async (event, workshopID) => {
+    try {
+        const scrapedData = await scrapeSteamWorkshopPage(workshopID);
+        return scrapedData;
+    } catch (error) {
+        console.error('Error scraping Steam Workshop page:', error);
+        return { error: 'Failed to scrape Steam Workshop page' };
     }
 });
 
