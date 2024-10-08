@@ -15,7 +15,7 @@ ipcMain.handle('save-mods-custom', async (_, modList, filePath) => {
 
 // Add the handler for saving mods
 ipcMain.handle('save-mods', async (_, modList) => {
-    const filePath = 'path_to_your_mods_file.json'; // Specify the appropriate path for saving
+   // const filePath = 'path_to_your_mods_file.json'; // Specify the appropriate path for saving
     try {
         await saveModsJson(modList, filePath);
         return true; // Indicate success
