@@ -13,8 +13,12 @@ const ModList = ({ mods, handleEdit, removeMod }) => {
                         <strong>{mod.modName || mod.name}</strong>
                         <p>Workshop ID: {mod.workshopID}</p>
                         <p>Mod ID: {mod.modID}</p>
-                        <p>Map Folder: {mod.mapFolder}</p>
-                        
+
+                        {/* Map Folder: Apply green background if it has a value */}
+                        <p style={{ backgroundColor: mod.mapFolder ? 'lightgreen' : 'inherit', padding: '2px 5px' }}>
+                            Map Folder: {mod.mapFolder || 'None'}
+                        </p>
+
                         <p>Requirements: {
                             mod.requirements?.split(';').map((reqID, i) => {
                                 const existsInMods = savedWorkshopIDs.includes(reqID); // Check if the ID exists
@@ -33,7 +37,7 @@ const ModList = ({ mods, handleEdit, removeMod }) => {
                                 );
                             })
                         }</p>
-                        
+
                         <a 
                             href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${mod.workshopID}`} 
                             target="_blank" 

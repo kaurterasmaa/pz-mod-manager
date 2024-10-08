@@ -75,15 +75,27 @@ ipcMain.handle('dialog:saveIniFile', async () => {
 
 function createWindow() {
     mainWindow = new BrowserWindow({
-        width: 800,
-        height: 600,
+        width: 1200, // Increased width for a better view
+        height: 800, // Increased height for a better view
+        minWidth: 1024, // Setting minimum width to prevent the window from being too small
+        minHeight: 768, // Setting minimum height
+        show: false, // Hides the window until it's ready to prevent flicker
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
-        }
+        },
+        backgroundColor: '#ffffff', // Better visual experience on load
+        title: 'ModManager', // Custom window title
     });
 
+    // Show window once content is fully loaded
+    mainWindow.once('ready-to-show', () => {
+        mainWindow.show();
+    });
+
+    // Loading the app's URL
     mainWindow.loadURL('http://localhost:3000');
+
     mainWindow.on('closed', function () {
         mainWindow = null;
     });
