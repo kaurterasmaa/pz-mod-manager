@@ -81,6 +81,9 @@ const ModManager = () => {
         <div>
             <h1>Mod Manager</h1>
 
+            {/* Mod Counter */}
+            <p>Number of Mods Loaded: {mods.length}</p>
+
             <ModForm
                 modName={modName}
                 setModName={setModName}
