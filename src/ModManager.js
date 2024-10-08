@@ -2,9 +2,9 @@ import React, { useContext } from 'react';
 import { ModContext } from './ModContext';
 import { ipcRenderer } from 'electron';
 import useModDataModel from './ModDataModel';
-import ModForm from './ModForm'; // Import ModForm component
-import ModList from './ModList'; // Import ModList component
-import FileOperations from './FileOperations'; // Import FileOperations component
+import ModForm from './ModForm';
+import ModList from './ModList';
+import FileOperations from './FileOperations';
 
 const ModManager = () => {
     const { mods, addOrEditMod, removeMod, setMods } = useContext(ModContext);
