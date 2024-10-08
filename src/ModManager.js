@@ -3,7 +3,7 @@ import { ModContext } from './ModContext';
 import { ipcRenderer } from 'electron';
 import useModDataModel from './ModDataModel';
 import ModForm from './ModForm';
-import ModList from './ModList';
+import ModListItem from './ModListItem';
 import FileOperations from './FileOperations';
 import Scraper from './Scraper';
 
@@ -104,7 +104,7 @@ const ModManager = () => {
                 editIndex={editIndex}
             />
 
-            <ModList
+            <ModListItem
                 mods={mods}
                 handleEdit={handleEdit}
                 removeMod={removeMod}
