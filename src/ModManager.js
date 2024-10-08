@@ -29,8 +29,9 @@ const ModManager = () => {
     const loadModsFromFile = async (filePath) => {
         try {
             if (filePath) {
+                setMods([]); // Clear the current mod list
                 const modsList = await ipcRenderer.invoke('load-mods-custom', filePath);
-                setMods(modsList);
+                setMods(modsList); // Load new mods
             }
         } catch (error) {
             console.error('Error loading mods from file:', error);
@@ -50,9 +51,10 @@ const ModManager = () => {
     const loadModsFromIniFile = async (filePath) => {
         try {
             if (filePath) {
+                setMods([]); // Clear the current mod list
                 const workshopIDs = await ipcRenderer.invoke('load-mods-ini', filePath);
                 const iniModsList = workshopIDs.map((id) => ({ workshopID: id, modName: `Mod-${id}` }));
-                setMods(iniModsList);
+                setMods(iniModsList); // Load new mods from INI
             }
         } catch (error) {
             console.error('Error loading mods from INI file:', error);
@@ -70,10 +72,15 @@ const ModManager = () => {
         }
     };
 
+    // Clear mods manually
+    const clearMods = () => {
+        setMods([]); // Clear the current mod list manually
+    };
+
     return (
         <div>
             <h1>Mod Manager</h1>
-            
+
             <ModForm
                 modName={modName}
                 setModName={setModName}
@@ -105,6 +112,9 @@ const ModManager = () => {
                 loadModsFromIniFile={loadModsFromIniFile}
                 saveModsToIniFile={saveModsToIniFile}
             />
+
+            {/* Button to clear mods manually */}
+            <button onClick={clearMods}>Clear Mods List</button>
         </div>
     );
 };

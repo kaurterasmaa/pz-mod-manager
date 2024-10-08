@@ -32,25 +32,26 @@ export const ModProvider = ({ children }) => {
     };
 
     // Function to add or edit a mod
-    const addOrEditMod = async (mod, isEdit = false) => {
-        const modExists = mods.some(existingMod => existingMod.workshopID === mod.workshopID);
+    const addOrEditMod = async (mod) => {
         let updatedMods;
 
-        if (!isEdit && modExists) {
-            setError('Mod with this workshop ID already exists.');  // Prevent duplicate mods
-            return; // Optionally notify user of duplicate
-        }
-
-        if (isEdit && editIndex !== null) {
-            updatedMods = mods.map((existingMod, index) =>
-                index === editIndex ? mod : existingMod
+        // Check for duplicates only if we are adding a new mod
+        const modExists = mods.some(existingMod => existingMod.workshopID === mod.workshopID);
+    
+        if (editIndex === null) {  // Adding a new mod
+            if (modExists) {
+                setError('Mod with this workshop ID already exists.');  // Prevent duplicate mods
+                return; // Exit early if duplicate exists
+            }
+            updatedMods = [...mods, mod];  // Add the new mod
+        } else {  // Editing an existing mod
+            updatedMods = mods.map((existingMod, index) => 
+                index === editIndex ? mod : existingMod  // Update the mod at editIndex
             );
             setEditIndex(null);  // Reset edit mode after update
-        } else {
-            updatedMods = [...mods, mod];
         }
 
-        setMods(updatedMods);
+        setMods(updatedMods);  // Update the mods state
         await saveMods(updatedMods);  // Save mods after adding/editing
     };
 
