@@ -4,64 +4,59 @@ import { ipcRenderer } from 'electron';
 const FileOperations = ({ loadModsFromFile, saveModsToFile, loadModsFromIniFile, saveModsToIniFile }) => {
     const defaultSaveFolder = './saves';
 
-    // Function to ensure the 'saves' folder exists
     const ensureSaveFolderExists = () => {
         const fs = window.require('fs');
         if (!fs.existsSync(defaultSaveFolder)) {
-            fs.mkdirSync(defaultSaveFolder); // Create the folder if it doesn't exist
+            fs.mkdirSync(defaultSaveFolder);
         }
     };
 
-    // Handle saving mods to a JSON file
     const handleSaveModsToJsonFile = async () => {
         try {
-            ensureSaveFolderExists(); // Ensure the folder exists before dialog opens
-            const { filePath } = await ipcRenderer.invoke('dialog:saveJsonFile'); // Exclusively save .json
+            ensureSaveFolderExists();
+            const { filePath } = await ipcRenderer.invoke('dialog:saveJsonFile');
 
             if (filePath) {
-                await saveModsToFile(filePath); // Pass the selected path to save function
+                await saveModsToFile(filePath);
             }
         } catch (error) {
             console.error('Error saving mods to JSON file:', error);
         }
     };
 
-    // Handle loading mods from a JSON file
     const handleLoadModsFromJsonFile = async () => {
         try {
-            ensureSaveFolderExists(); // Ensure the folder exists before dialog opens
-            const { filePath } = await ipcRenderer.invoke('dialog:openJsonFile'); // Exclusively load .json
+            ensureSaveFolderExists();
+            const { filePath } = await ipcRenderer.invoke('dialog:openJsonFile');
 
             if (filePath) {
-                await loadModsFromFile(filePath); // Pass the selected file path to load function
+                await loadModsFromFile(filePath);
             }
         } catch (error) {
             console.error('Error loading mods from JSON file:', error);
         }
     };
 
-    // Handle saving mods to an INI file
     const handleSaveModsToIniFile = async () => {
         try {
             ensureSaveFolderExists();
-            const { filePath } = await ipcRenderer.invoke('dialog:saveIniFile'); // Exclusively save .ini
+            const { filePath } = await ipcRenderer.invoke('dialog:saveIniFile');
 
             if (filePath) {
-                await saveModsToIniFile(filePath); // Pass the selected path to save function
+                await saveModsToIniFile(filePath);
             }
         } catch (error) {
             console.error('Error saving mods to INI file:', error);
         }
     };
 
-    // Handle loading mods from an INI file
     const handleLoadModsFromIniFile = async () => {
         try {
             ensureSaveFolderExists();
-            const { filePath } = await ipcRenderer.invoke('dialog:openIniFile'); // Exclusively load .ini
+            const { filePath } = await ipcRenderer.invoke('dialog:openIniFile');
 
             if (filePath) {
-                await loadModsFromIniFile(filePath); // Pass the selected file path to load function
+                await loadModsFromIniFile(filePath);
             }
         } catch (error) {
             console.error('Error loading mods from INI file:', error);
@@ -75,8 +70,8 @@ const FileOperations = ({ loadModsFromFile, saveModsToFile, loadModsFromIniFile,
             <button onClick={handleLoadModsFromJsonFile}>Load Mods from JSON File</button>
             <button onClick={handleSaveModsToJsonFile}>Save Mods to JSON File</button>
 
-            <button onClick={handleLoadModsFromIniFile}>Load Mods from INI File</button> {/* Button for INI load */}
-            <button onClick={handleSaveModsToIniFile}>Save Mods to INI File</button>   {/* Button for INI save */}
+            <button onClick={handleLoadModsFromIniFile}>Load Mods from INI File</button>
+            <button onClick={handleSaveModsToIniFile}>Save Mods to INI File</button>
         </div>
     );
 };

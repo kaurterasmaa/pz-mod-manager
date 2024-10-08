@@ -26,7 +26,6 @@ const ModManager = () => {
         setEditIndex(index);
     };
 
-    // Load mods from JSON
     const loadModsFromFile = async (filePath) => {
         try {
             if (filePath) {
@@ -38,7 +37,6 @@ const ModManager = () => {
         }
     };
 
-    // Save mods to JSON
     const saveModsToFile = async (filePath) => {
         try {
             if (filePath) {
@@ -49,7 +47,6 @@ const ModManager = () => {
         }
     };
 
-    // Load mods from INI
     const loadModsFromIniFile = async (filePath) => {
         try {
             if (filePath) {
@@ -62,7 +59,6 @@ const ModManager = () => {
         }
     };
 
-    // Save mods to INI
     const saveModsToIniFile = async (filePath) => {
         try {
             if (filePath) {
@@ -106,8 +102,8 @@ const ModManager = () => {
             <FileOperations
                 loadModsFromFile={loadModsFromFile}
                 saveModsToFile={saveModsToFile}
-                loadModsFromIniFile={loadModsFromIniFile}   // New INI load function
-                saveModsToIniFile={saveModsToIniFile}       // New INI save function
+                loadModsFromIniFile={loadModsFromIniFile}
+                saveModsToIniFile={saveModsToIniFile}
             />
         </div>
     );

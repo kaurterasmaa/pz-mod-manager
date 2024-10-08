@@ -13,7 +13,7 @@ ipcMain.handle('save-mods-custom', async (_, modList, filePath) => {
     return saveModsJson(modList, filePath);
 });
 
-ipcMain.handle('dialog:openJsonFile', async () => {  // For loading .json files
+ipcMain.handle('dialog:openJsonFile', async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
         properties: ['openFile'],
         filters: [{ name: 'JSON', extensions: ['json'] }],
@@ -23,7 +23,7 @@ ipcMain.handle('dialog:openJsonFile', async () => {  // For loading .json files
     }
 });
 
-ipcMain.handle('dialog:saveJsonFile', async () => {  // For saving .json files
+ipcMain.handle('dialog:saveJsonFile', async () => {
     const { canceled, filePath } = await dialog.showSaveDialog({
         filters: [{ name: 'JSON', extensions: ['json'] }],
     });
@@ -41,7 +41,7 @@ ipcMain.handle('save-mods-ini', async (_, workshopIDs, filePath) => {
     return saveModsIni(workshopIDs, filePath);
 });
 
-ipcMain.handle('dialog:openIniFile', async () => {  // For loading .ini files
+ipcMain.handle('dialog:openIniFile', async () => {
     const { canceled, filePaths } = await dialog.showOpenDialog({
         properties: ['openFile'],
         filters: [{ name: 'INI', extensions: ['ini'] }],
@@ -51,7 +51,7 @@ ipcMain.handle('dialog:openIniFile', async () => {  // For loading .ini files
     }
 });
 
-ipcMain.handle('dialog:saveIniFile', async () => {  // For saving .ini files
+ipcMain.handle('dialog:saveIniFile', async () => {
     const { canceled, filePath } = await dialog.showSaveDialog({
         filters: [{ name: 'INI', extensions: ['ini'] }],
     });

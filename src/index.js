@@ -1,15 +1,14 @@
 import React from 'react';
-import ReactDOM from 'react-dom/client'; // Import from react-dom/client
+import ReactDOM from 'react-dom/client';
 import ModManager from './ModManager';
-import { ModProvider } from './ModContext'; // Import the context provider
+import { ModProvider } from './ModContext';
 
-const rootElement = document.getElementById('app'); // Use the ID of your root div
-const root = ReactDOM.createRoot(rootElement); // Create a root instance
+const rootElement = document.getElementById('app');
+const root = ReactDOM.createRoot(rootElement);
 
-// Render your ModManager component within the ModProvider context
 root.render(
   <React.StrictMode>
-    <ModProvider>  {/* Wrap in ModProvider */}
+    <ModProvider>
       <ModManager />
     </ModProvider>
   </React.StrictMode>

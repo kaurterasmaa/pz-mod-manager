@@ -1,6 +1,5 @@
 const fs = require('fs');
 
-// Function to load mods from an '.ini' file
 function loadModsIni(filePath) {
     return new Promise((resolve, reject) => {
         fs.readFile(filePath, 'utf-8', (err, data) => {
@@ -13,14 +12,13 @@ function loadModsIni(filePath) {
                     const workshopIDs = workshopLine.replace('WorkshopItems=', '').split(';').map(id => id.trim());
                     resolve(workshopIDs);
                 } else {
-                    resolve([]); // No WorkshopItems found
+                    resolve([]);
                 }
             }
         });
     });
 }
 
-// Function to save mods to an '.ini' file
 function saveModsIni(workshopIDs, filePath) {
     return new Promise((resolve, reject) => {
         const workshopLine = `WorkshopItems=${workshopIDs.join(';')}\n`;
