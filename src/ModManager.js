@@ -85,25 +85,6 @@ const ModManager = () => {
 
             <p>Number of Mods Loaded: {mods.length}</p>
 
-            <ModForm
-                modName={modName}
-                setModName={setModName}
-                workshopID={workshopID}
-                setWorkshopID={setWorkshopID}
-                modID={modID}
-                setModID={setModID}
-                mapFolder={mapFolder}
-                setMapFolder={setMapFolder}
-                requirements={requirements}
-                setRequirements={setRequirements}
-                modSource={modSource}
-                setModSource={setModSource}
-                modEnabled={modEnabled}
-                setModEnabled={setModEnabled}
-                handleAddOrEditMod={handleAddOrEditMod}
-                editIndex={editIndex}
-            />
-
             <ModListItem
                 mods={mods}
                 handleEdit={handleEdit}
@@ -123,7 +104,26 @@ const ModManager = () => {
                 {showScraper ? 'Hide Scraper' : 'Show Scraper'}
             </button>
 
-            {showScraper && <Scraper />} {/* Conditional rendering of the Scraper component */}
+            <ModForm
+                modName={modName}
+                setModName={setModName}
+                workshopID={workshopID}
+                setWorkshopID={setWorkshopID}
+                modID={modID}
+                setModID={setModID}
+                mapFolder={mapFolder}
+                setMapFolder={setMapFolder}
+                requirements={requirements}
+                setRequirements={setRequirements}
+                modSource={modSource}
+                setModSource={setModSource}
+                modEnabled={modEnabled}
+                setModEnabled={setModEnabled}
+                handleAddOrEditMod={handleAddOrEditMod}
+                editIndex={editIndex}
+            />
+
+            {showScraper && <Scraper />}
         </div>
     );
 };
