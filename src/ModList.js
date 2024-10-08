@@ -1,6 +1,9 @@
 import React from 'react';
 
 const ModList = ({ mods, handleEdit, removeMod }) => {
+    // Create a list of all workshop IDs from saved mods
+    const savedWorkshopIDs = mods.map(mod => mod.workshopID);
+
     return (
         <div>
             <h2>Installed Mods</h2>
@@ -13,18 +16,22 @@ const ModList = ({ mods, handleEdit, removeMod }) => {
                         <p>Map Folder: {mod.mapFolder}</p>
                         
                         <p>Requirements: {
-                            mod.requirements?.split(';').map((reqID, i) => (
-                                <span key={i}>
-                                    <a 
-                                        href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${reqID}`} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer"
-                                    >
-                                        {reqID}
-                                    </a>
-                                    {i < mod.requirements.split(';').length - 1 && '; '}
-                                </span>
-                            ))
+                            mod.requirements?.split(';').map((reqID, i) => {
+                                const existsInMods = savedWorkshopIDs.includes(reqID); // Check if the ID exists
+                                return (
+                                    <span key={i}>
+                                        <a 
+                                            href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${reqID}`} 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            style={{ color: existsInMods ? 'inherit' : 'red' }} // Apply red if not found
+                                        >
+                                            {reqID}
+                                        </a>
+                                        {i < mod.requirements.split(';').length - 1 && '; '}
+                                    </span>
+                                );
+                            })
                         }</p>
                         
                         <a 
