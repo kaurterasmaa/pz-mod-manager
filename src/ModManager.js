@@ -1,4 +1,4 @@
-import React, { useContext, useState, useMemo } from 'react';
+import React, { useContext, useState } from 'react';
 import { ModContext } from './ModContext';
 import { ipcRenderer } from 'electron';
 import useModDataModel from './ModDataModel';
@@ -8,7 +8,7 @@ import FileOperations from './FileOperations';
 import Scraper from './Scraper';
 
 const ModManager = () => {
-    const { mods, setMods, removeMod } = useContext(ModContext);
+    const { mods, setMods, removeMod, setFilePath } = useContext(ModContext);
     const {
         modName, setModName, workshopID, setWorkshopID, modID, setModID,
         mapFolder, setMapFolder, requirements, setRequirements,
@@ -19,7 +19,14 @@ const ModManager = () => {
     const [showScraper, setShowScraper] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [loading, setLoading] = useState(false);
-    const [currentEditIndex, setCurrentEditIndex] = useState(null); 
+    const [currentEditIndex, setCurrentEditIndex] = useState(null);
+
+    const handleFileSelection = async () => {
+        const result = await ipcRenderer.invoke('select-file');
+        if (result) {
+            setFilePath(result);
+        }
+    };
 
     const handleAddOrEditMod = () => {
         const newMod = getMod();
@@ -49,6 +56,7 @@ const ModManager = () => {
                 setMods([]);
                 const modsList = await ipcRenderer.invoke('load-mods-custom', filePath);
                 setMods(modsList);
+                setFilePath(filePath); // Set the filePath when loading mods
             }
         } catch (error) {
             setErrorMessage('Error loading mods from file. Please try again.');
@@ -59,7 +67,8 @@ const ModManager = () => {
     };
 
     const saveModsToJson = async () => {
-        const filePath = await getFilePath(); // Implement this to get file path from user
+        await handleFileSelection(); // Let user select file path first
+        const filePath = getFilePath(); // Use the filePath from context
         if (filePath) {
             try {
                 await ipcRenderer.invoke('save-mods-custom', mods, filePath);
@@ -91,11 +100,9 @@ const ModManager = () => {
     const saveModsToIniFile = async (filePath) => {
         try {
             if (filePath) {
-                const workshopIDs = mods.map(mod => mod.workshopID);
-                await ipcRenderer.invoke('save-mods-ini', workshopIDs, filePath);
+                await ipcRenderer.invoke('save-mods-ini', mods, filePath); // Pass entire mods list
             }
         } catch (error) {
-            setErrorMessage('Error saving mods to INI file. Please try again.');
             console.error('Error saving mods to INI file:', error);
         }
     };
