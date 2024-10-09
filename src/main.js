@@ -13,16 +13,16 @@ ipcMain.handle('save-mods-custom', async (_, modList, filePath) => {
     return saveModsJson(modList, filePath);
 });
 
-// Add the handler for saving mods
-ipcMain.handle('save-mods', async (_, modList) => {
+ipcMain.handle('save-mods', async (_, modList, filePath) => { // Ensure filePath is passed here
     try {
-        await saveModsJson(modList, filePath);
+        await saveModsJson(modList, filePath); // Save mods with the given filePath
         return true; // Indicate success
     } catch (error) {
         console.error('Error saving mods:', error);
         throw error; // Propagate the error
     }
 });
+
 
 // Dialog Handlers
 ipcMain.handle('dialog:openJsonFile', async () => {

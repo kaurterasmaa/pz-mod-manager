@@ -23,21 +23,21 @@ export const ModProvider = ({ children }) => {
     // Function to save mods to file
     const saveMods = async (modList) => {
         try {
-            await ipcRenderer.invoke('save-mods', modList);
-            setError(null);  // Clear error if saving is successful
+            await ipcRenderer.invoke('save-mods-custom', modList, filePath); // Ensure filePath is defined
         } catch (error) {
-            console.error('Error saving mod file:', error);
-            setError('Failed to save mods.');  // Set error message for UI
+            console.error('Error saving mods:', error);
+            throw error; // Propagate the error
         }
     };
 
-    // Function to add or edit a mod
     const addOrEditMod = async (mod) => {
         let updatedMods;
 
         // Check for duplicates only if we are adding a new mod
-        const modExists = mods.some(existingMod => existingMod.workshopID === mod.workshopID);
-    
+        const modExists = mods.some((existingMod, index) =>
+            existingMod.workshopID === mod.workshopID && index !== editIndex  // Exclude the mod being edited
+        );
+
         if (editIndex === null) {  // Adding a new mod
             if (modExists) {
                 setError('Mod with this workshop ID already exists.');  // Prevent duplicate mods
@@ -45,7 +45,11 @@ export const ModProvider = ({ children }) => {
             }
             updatedMods = [...mods, mod];  // Add the new mod
         } else {  // Editing an existing mod
-            updatedMods = mods.map((existingMod, index) => 
+            if (modExists) {
+                setError('Mod with this workshop ID already exists.');  // Prevent editing to a duplicate
+                return;
+            }
+            updatedMods = mods.map((existingMod, index) =>
                 index === editIndex ? mod : existingMod  // Update the mod at editIndex
             );
             setEditIndex(null);  // Reset edit mode after update
@@ -71,7 +75,7 @@ export const ModProvider = ({ children }) => {
         <ModContext.Provider value={{
             mods, 
             setMods, 
-            addOrEditMod: (mod) => addOrEditMod(mod, editIndex !== null),  // Simplified add/edit handling
+            addOrEditMod,  // Simplified add/edit handling
             removeMod,
             editIndex, 
             setEditIndex,

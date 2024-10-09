@@ -8,31 +8,47 @@ import FileOperations from './FileOperations';
 import Scraper from './Scraper';
 
 const ModManager = () => {
-    const { mods, addOrEditMod, removeMod, setMods } = useContext(ModContext);
+    const { mods, setMods, removeMod } = useContext(ModContext);
     const {
-        modName, setModName, workshopID, setWorkshopID, modID, setModID, mapFolder, setMapFolder,
-        requirements, setRequirements, modSource, setModSource, modEnabled, setModEnabled,
+        modName, setModName, workshopID, setWorkshopID, modID, setModID,
+        mapFolder, setMapFolder, requirements, setRequirements,
+        modSource, setModSource, modEnabled, setModEnabled,
         editIndex, setEditIndex, resetFields, getMod, setMod,
     } = useModDataModel();
 
     const [showScraper, setShowScraper] = useState(false); // State to control Scraper visibility
 
+    // State to manage the edited mod index
+    const [currentEditIndex, setCurrentEditIndex] = useState(null); 
+
+    // Function to handle adding or editing a mod
     const handleAddOrEditMod = () => {
-        const newMod = getMod();
-        addOrEditMod(newMod, editIndex);
-        resetFields();
+        const newMod = getMod(); // Get mod data from the custom hook
+        if (currentEditIndex === null) {
+            // Add a new mod
+            setMods((prevMods) => [...prevMods, newMod]); // Add new mod to the list
+        } else {
+            // Edit an existing mod
+            setMods((prevMods) => {
+                const updatedMods = [...prevMods];
+                updatedMods[currentEditIndex] = newMod; // Update the specific mod
+                return updatedMods; // Return updated mod list
+            });
+            setCurrentEditIndex(null); // Reset edit index after saving
+        }
+        resetFields(); // Reset the form fields
     };
 
     const handleEdit = (index) => {
         const modToEdit = mods[index];
-        setMod(modToEdit);
-        setEditIndex(index);
+        setMod(modToEdit); // Populate form with mod data
+        setCurrentEditIndex(index); // Set the index for editing
     };
 
     const loadModsFromFile = async (filePath) => {
         try {
             if (filePath) {
-                setMods([]);
+                setMods([]); // Clear current mods
                 const modsList = await ipcRenderer.invoke('load-mods-custom', filePath);
                 setMods(modsList);
             }
@@ -41,13 +57,15 @@ const ModManager = () => {
         }
     };
 
-    const saveModsToFile = async (filePath) => {
-        try {
-            if (filePath) {
-                await ipcRenderer.invoke('save-mods-custom', mods, filePath);
+    const saveModsToJson = async () => {
+        const filePath = await getFilePath(); // Implement this to get file path from user
+        if (filePath) {
+            try {
+                await ipcRenderer.invoke('save-mods-custom', mods, filePath); // Save current mods to JSON
+                console.log('Mods saved to JSON successfully');
+            } catch (error) {
+                console.error('Error saving mods to JSON:', error);
             }
-        } catch (error) {
-            console.error('Error saving mods to file:', error);
         }
     };
 
@@ -93,7 +111,7 @@ const ModManager = () => {
 
             <FileOperations
                 loadModsFromFile={loadModsFromFile}
-                saveModsToFile={saveModsToFile}
+                saveModsToFile={saveModsToJson} // Updated to save JSON correctly
                 loadModsFromIniFile={loadModsFromIniFile}
                 saveModsToIniFile={saveModsToIniFile}
             />
@@ -120,7 +138,7 @@ const ModManager = () => {
                 modEnabled={modEnabled}
                 setModEnabled={setModEnabled}
                 handleAddOrEditMod={handleAddOrEditMod}
-                editIndex={editIndex}
+                editIndex={currentEditIndex} // Pass the current edit index
             />
 
             {showScraper && <Scraper />}
