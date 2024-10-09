@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useMemo } from 'react';
 import { ModContext } from './ModContext';
 import { ipcRenderer } from 'electron';
 import useModDataModel from './ModDataModel';
@@ -16,44 +16,45 @@ const ModManager = () => {
         editIndex, setEditIndex, resetFields, getMod, setMod,
     } = useModDataModel();
 
-    const [showScraper, setShowScraper] = useState(false); // State to control Scraper visibility
-
-    // State to manage the edited mod index
+    const [showScraper, setShowScraper] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [loading, setLoading] = useState(false);
     const [currentEditIndex, setCurrentEditIndex] = useState(null); 
 
-    // Function to handle adding or editing a mod
     const handleAddOrEditMod = () => {
-        const newMod = getMod(); // Get mod data from the custom hook
+        const newMod = getMod();
         if (currentEditIndex === null) {
-            // Add a new mod
-            setMods((prevMods) => [...prevMods, newMod]); // Add new mod to the list
+            setMods((prevMods) => [...prevMods, newMod]);
         } else {
-            // Edit an existing mod
             setMods((prevMods) => {
                 const updatedMods = [...prevMods];
-                updatedMods[currentEditIndex] = newMod; // Update the specific mod
-                return updatedMods; // Return updated mod list
+                updatedMods[currentEditIndex] = newMod;
+                return updatedMods;
             });
-            setCurrentEditIndex(null); // Reset edit index after saving
+            setCurrentEditIndex(null);
         }
-        resetFields(); // Reset the form fields
+        resetFields();
     };
 
     const handleEdit = (index) => {
         const modToEdit = mods[index];
-        setMod(modToEdit); // Populate form with mod data
-        setCurrentEditIndex(index); // Set the index for editing
+        setMod(modToEdit);
+        setCurrentEditIndex(index);
     };
 
     const loadModsFromFile = async (filePath) => {
+        setLoading(true);
         try {
             if (filePath) {
-                setMods([]); // Clear current mods
+                setMods([]);
                 const modsList = await ipcRenderer.invoke('load-mods-custom', filePath);
                 setMods(modsList);
             }
         } catch (error) {
+            setErrorMessage('Error loading mods from file. Please try again.');
             console.error('Error loading mods from file:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -61,24 +62,29 @@ const ModManager = () => {
         const filePath = await getFilePath(); // Implement this to get file path from user
         if (filePath) {
             try {
-                await ipcRenderer.invoke('save-mods-custom', mods, filePath); // Save current mods to JSON
+                await ipcRenderer.invoke('save-mods-custom', mods, filePath);
                 console.log('Mods saved to JSON successfully');
             } catch (error) {
+                setErrorMessage('Error saving mods to JSON. Please try again.');
                 console.error('Error saving mods to JSON:', error);
             }
         }
     };
 
     const loadModsFromIniFile = async (filePath) => {
+        setLoading(true);
         try {
             if (filePath) {
-                setMods([]); // Clear the current mod list
+                setMods([]);
                 const workshopIDs = await ipcRenderer.invoke('load-mods-ini', filePath);
                 const iniModsList = workshopIDs.map((id) => ({ workshopID: id, modName: `Mod-${id}` }));
                 setMods(iniModsList);
             }
         } catch (error) {
+            setErrorMessage('Error loading mods from INI file. Please try again.');
             console.error('Error loading mods from INI file:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -89,18 +95,23 @@ const ModManager = () => {
                 await ipcRenderer.invoke('save-mods-ini', workshopIDs, filePath);
             }
         } catch (error) {
+            setErrorMessage('Error saving mods to INI file. Please try again.');
             console.error('Error saving mods to INI file:', error);
         }
     };
 
     const clearMods = () => {
-        setMods([]);
+        if (window.confirm('Are you sure you want to clear the mods list?')) {
+            setMods([]);
+        }
     };
 
     return (
         <div>
             <h1>Mod Manager</h1>
 
+            {errorMessage && <p className="error">{errorMessage}</p>}
+            {loading && <p>Loading...</p>}
             <p>Number of Mods Loaded: {mods.length}</p>
 
             <ModListItem
@@ -111,7 +122,7 @@ const ModManager = () => {
 
             <FileOperations
                 loadModsFromFile={loadModsFromFile}
-                saveModsToFile={saveModsToJson} // Updated to save JSON correctly
+                saveModsToFile={saveModsToJson}
                 loadModsFromIniFile={loadModsFromIniFile}
                 saveModsToIniFile={saveModsToIniFile}
             />
@@ -138,10 +149,10 @@ const ModManager = () => {
                 modEnabled={modEnabled}
                 setModEnabled={setModEnabled}
                 handleAddOrEditMod={handleAddOrEditMod}
-                editIndex={currentEditIndex} // Pass the current edit index
+                editIndex={currentEditIndex}
             />
 
-            {showScraper && <Scraper />}
+            {showScraper && <Scraper setModName={setModName} setWorkshopID={setWorkshopID} setModID={setModID} setMapFolder={setMapFolder} />}
         </div>
     );
 };
