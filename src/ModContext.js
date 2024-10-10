@@ -40,27 +40,24 @@ export const ModProvider = ({ children }) => {
     };
 
     const addOrEditMod = async (mod) => {
-        let updatedMods;
+        let updatedMods = [...mods];
 
-        // Check for duplicates only if we are adding a new mod
-        const modExists = mods.some((existingMod, index) =>
-            existingMod.workshopID === mod.workshopID && index !== editIndex  // Exclude the mod being edited
-        );
+        // Check for duplicates to determine if we need to remove an existing mod
+        const existingModIndex = updatedMods.findIndex(existingMod => existingMod.workshopID === mod.workshopID);
 
         if (editIndex === null) {  // Adding a new mod
-            if (modExists) {
+            if (existingModIndex !== -1) {
                 setError('Mod with this workshop ID already exists.');  // Prevent duplicate mods
                 return; // Exit early if duplicate exists
             }
-            updatedMods = [...mods, mod];  // Add the new mod
+            updatedMods.push(mod);  // Add the new mod
         } else {  // Editing an existing mod
-            if (modExists) {
-                setError('Mod with this workshop ID already exists.');  // Prevent editing to a duplicate
-                return;
+            if (existingModIndex !== -1 && existingModIndex !== editIndex) {
+                // Remove the existing mod with the same workshop ID if it's not the one being edited
+                updatedMods.splice(existingModIndex, 1);
             }
-            updatedMods = mods.map((existingMod, index) =>
-                index === editIndex ? mod : existingMod  // Update the mod at editIndex
-            );
+            // Update the mod at editIndex or add as new if editIndex is null
+            updatedMods[editIndex] = mod;  // Replace the mod at editIndex
             setEditIndex(null);  // Reset edit mode after update
         }
 
