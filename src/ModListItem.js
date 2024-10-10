@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ModListItem = ({ mods, handleEdit, removeMod }) => {
+const ModListItem = ({ mods, onEdit, removeMod }) => {  // Change handleEdit to onEdit
     // Create a list of all workshop IDs from saved mods
     const savedWorkshopIDs = mods.map(mod => mod.workshopID);
 
@@ -46,7 +46,7 @@ const ModListItem = ({ mods, handleEdit, removeMod }) => {
                             View on Steam
                         </a>
                         <div>
-                            <button onClick={() => handleEdit(index)}>Edit</button>
+                            <button onClick={() => onEdit(mod)}>Edit</button> {/* Pass the whole mod object instead of index */}
                             <button onClick={() => removeMod(mod.workshopID)}>Remove</button>
                         </div>
                         <p>Enabled: {mod.modEnabled ? 'Yes' : 'No'}</p>

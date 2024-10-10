@@ -7,12 +7,14 @@ export const ModProvider = ({ children }) => {
     const [mods, setMods] = useState([]);
     const [editIndex, setEditIndex] = useState(null);
     const [error, setError] = useState(null);  // Error handling
+    const [filePath, setFilePath] = useState(null);  // Store file path
 
     // Function to load mods from file
     const loadMods = async () => {
         try {
-            const modsList = await ipcRenderer.invoke('load-mods');
-            setMods(modsList);
+            const { modsListItem, path } = await ipcRenderer.invoke('load-mods'); // Expect path from the response
+            setMods(modsListItem);
+            setFilePath(path); // Store the file path
             setError(null);  // Clear error if loading is successful
         } catch (error) {
             console.error('Error loading mods:', error);
@@ -21,9 +23,16 @@ export const ModProvider = ({ children }) => {
     };
 
     // Function to save mods to file
-    const saveMods = async (modList) => {
+    const saveMods = async (modListItem) => {
+        if (!filePath) {
+            console.error('No filePath available for saving mods.');
+            setError('File path is not defined. Please load a file first.');
+            return;
+        }
+
         try {
-            await ipcRenderer.invoke('save-mods-custom', modList, filePath); // Ensure filePath is defined
+            await ipcRenderer.invoke('save-mods-custom', modListItem, filePath); // Use the stored filePath
+            setError(null);  // Clear error on successful save
         } catch (error) {
             console.error('Error saving mods:', error);
             throw error; // Propagate the error

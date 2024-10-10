@@ -1,147 +1,124 @@
-import React, { useContext, useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { ModContext } from './ModContext';
 import { ipcRenderer } from 'electron';
-import useModDataModel from './ModDataModel';
-import ModForm from './ModForm';
-import ModListItem from './ModListItem';
 import FileOperations from './FileOperations';
-import Scraper from './Scraper';
+import ModEditor from './ModEditor';
+import ModListItem from './ModListItem';
 
 const ModManager = () => {
-    const { mods, setMods, removeMod } = useContext(ModContext);
-    const {
-        modName, setModName, workshopID, setWorkshopID, modID, setModID,
-        mapFolder, setMapFolder, requirements, setRequirements,
-        modSource, setModSource, modEnabled, setModEnabled,
-        editIndex, setEditIndex, resetFields, getMod, setMod,
-    } = useModDataModel();
-
-    const [showScraper, setShowScraper] = useState(false); // State to control Scraper visibility
-
-    // State to manage the edited mod index
-    const [currentEditIndex, setCurrentEditIndex] = useState(null); 
-
-    // Function to handle adding or editing a mod
-    const handleAddOrEditMod = () => {
-        const newMod = getMod(); // Get mod data from the custom hook
-        if (currentEditIndex === null) {
-            // Add a new mod
-            setMods((prevMods) => [...prevMods, newMod]); // Add new mod to the list
-        } else {
-            // Edit an existing mod
-            setMods((prevMods) => {
-                const updatedMods = [...prevMods];
-                updatedMods[currentEditIndex] = newMod; // Update the specific mod
-                return updatedMods; // Return updated mod list
-            });
-            setCurrentEditIndex(null); // Reset edit index after saving
-        }
-        resetFields(); // Reset the form fields
-    };
-
-    const handleEdit = (index) => {
-        const modToEdit = mods[index];
-        setMod(modToEdit); // Populate form with mod data
-        setCurrentEditIndex(index); // Set the index for editing
-    };
+    const { mods, setMods, addOrEditMod, removeMod } = useContext(ModContext);
+    const [editMod, setEditMod] = useState(null); // Mod being edited
+    const [isNewMod, setIsNewMod] = useState(false); // Track if new mod is being added
+    const [scrapedData, setScrapedData] = useState(null); // Store scraped Steam data
+    const [workshopID, setWorkshopID] = useState(''); // Store workshop ID input
 
     const loadModsFromFile = async (filePath) => {
-        try {
-            if (filePath) {
-                setMods([]); // Clear current mods
-                const modsList = await ipcRenderer.invoke('load-mods-custom', filePath);
-                setMods(modsList);
-            }
-        } catch (error) {
-            console.error('Error loading mods from file:', error);
-        }
+        const modsList = await ipcRenderer.invoke('load-mods-custom', filePath);
+        setMods(modsList);
     };
 
-    const saveModsToJson = async () => {
-        const filePath = await getFilePath(); // Implement this to get file path from user
-        if (filePath) {
-            try {
-                await ipcRenderer.invoke('save-mods-custom', mods, filePath); // Save current mods to JSON
-                console.log('Mods saved to JSON successfully');
-            } catch (error) {
-                console.error('Error saving mods to JSON:', error);
-            }
+    const saveModsToFile = async (filePath) => {
+        if (!filePath) {
+            alert('Please select a file to save.');
+            return;
         }
+        await ipcRenderer.invoke('save-mods-custom', mods, filePath);
     };
 
     const loadModsFromIniFile = async (filePath) => {
-        try {
-            if (filePath) {
-                setMods([]); // Clear the current mod list
-                const workshopIDs = await ipcRenderer.invoke('load-mods-ini', filePath);
-                const iniModsList = workshopIDs.map((id) => ({ workshopID: id, modName: `Mod-${id}` }));
-                setMods(iniModsList);
-            }
-        } catch (error) {
-            console.error('Error loading mods from INI file:', error);
-        }
+        const workshopIDs = await ipcRenderer.invoke('load-mods-ini', filePath);
+        const iniModsList = workshopIDs.map((id) => ({ workshopID: id, modName: `Mod-${id}` }));
+        setMods(iniModsList);
     };
 
     const saveModsToIniFile = async (filePath) => {
-        try {
-            if (filePath) {
-                const workshopIDs = mods.map(mod => mod.workshopID);
-                await ipcRenderer.invoke('save-mods-ini', workshopIDs, filePath);
-            }
-        } catch (error) {
-            console.error('Error saving mods to INI file:', error);
+        if (!filePath) {
+            alert('Please select a file to save.');
+            return;
         }
+        const workshopIDs = mods.map((mod) => mod.workshopID);
+        await ipcRenderer.invoke('save-mods-ini', workshopIDs, filePath);
     };
 
-    const clearMods = () => {
-        setMods([]);
+    const handleEditMod = (mod) => {
+        setEditMod(mod); // Open editor for selected mod
+        setIsNewMod(false); // Editing existing mod
+    };
+
+    const handleAddNewMod = () => {
+        setEditMod({ modName: '', workshopID: '', modID: '', mapFolder: '', requirements: '', modSource: '', modEnabled: false });
+        setIsNewMod(true); // Indicate it's a new mod being added
+    };
+
+    const handleSaveMod = (updatedMod) => {
+        if (!updatedMod.modName || !updatedMod.workshopID) {
+            alert('Mod Name and Workshop ID are required.');
+            return;
+        }
+        addOrEditMod(updatedMod);
+        setEditMod(null); // Close editor after saving
+        setIsNewMod(false); // Reset the "Add New" flag
+        setScrapedData(null); // Clear scraped data after saving
+    };
+
+    const handleCancelEdit = () => {
+        setEditMod(null); // Close editor without saving
+        setIsNewMod(false); // Reset the "Add New" flag
+    };
+
+    const handleScrapeSteamData = async () => {
+        try {
+            const data = await ipcRenderer.invoke('scrape-steam-page', workshopID);
+            setScrapedData(data);
+        } catch (error) {
+            console.error('Failed to scrape Steam data:', error);
+            setScrapedData({ title: 'Error', description: 'Failed to retrieve Steam data.' });
+        }
     };
 
     return (
         <div>
             <h1>Mod Manager</h1>
-
             <p>Number of Mods Loaded: {mods.length}</p>
 
-            <ModListItem
-                mods={mods}
-                handleEdit={handleEdit}
-                removeMod={removeMod}
-            />
+            {/* Mod List */}
+            <ModListItem mods={mods} onEdit={handleEditMod} removeMod={removeMod} />
 
+            {/* Add New Mod Button */}
+            <button onClick={handleAddNewMod}>Add New Mod</button>
+
+            {/* File Operations (Load/Save mods from files) */}
             <FileOperations
                 loadModsFromFile={loadModsFromFile}
-                saveModsToFile={saveModsToJson} // Updated to save JSON correctly
+                saveModsToFile={saveModsToFile}
                 loadModsFromIniFile={loadModsFromIniFile}
                 saveModsToIniFile={saveModsToIniFile}
             />
 
-            <button onClick={clearMods}>Clear Mods List</button>
+            {/* Mod Editor Section */}
+            {editMod ? (
+                <ModEditor mod={editMod} onSave={handleSaveMod} onCancel={handleCancelEdit} scrapedData={scrapedData} />
+            ) : (
+                <div>Select a mod to edit or add a new one</div>
+            )}
 
-            <button onClick={() => setShowScraper(!showScraper)}>
-                {showScraper ? 'Hide Scraper' : 'Show Scraper'}
-            </button>
-
-            <ModForm
-                modName={modName}
-                setModName={setModName}
-                workshopID={workshopID}
-                setWorkshopID={setWorkshopID}
-                modID={modID}
-                setModID={setModID}
-                mapFolder={mapFolder}
-                setMapFolder={setMapFolder}
-                requirements={requirements}
-                setRequirements={setRequirements}
-                modSource={modSource}
-                setModSource={setModSource}
-                modEnabled={modEnabled}
-                setModEnabled={setModEnabled}
-                handleAddOrEditMod={handleAddOrEditMod}
-                editIndex={currentEditIndex} // Pass the current edit index
+            {/* Steam Workshop Scraper */}
+            <h3>Steam Workshop Scraper</h3>
+            <input
+                type="text"
+                placeholder="Enter Workshop ID"
+                value={workshopID}
+                onChange={(e) => setWorkshopID(e.target.value)}
             />
+            <button onClick={handleScrapeSteamData}>Scrape Steam Data</button>
 
-            {showScraper && <Scraper />}
+            {/* Display Scraped Data */}
+            {scrapedData && (
+                <div>
+                    <p>Title: {scrapedData.title}</p>
+                    <p>Description: {scrapedData.description}</p>
+                </div>
+            )}
         </div>
     );
 };
