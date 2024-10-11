@@ -1,11 +1,7 @@
 import React from 'react';
 
-<<<<<<< HEAD
 const ModListItem = ({ mods, onEdit, removeMod }) => {  // Change handleEdit to onEdit
     // Create a list of all workshop IDs from saved mods
-=======
-const ModListItem = ({ mods, handleEdit, removeMod }) => {
->>>>>>> f4e22c611599c205328553b17402a955aa13ae16
     const savedWorkshopIDs = mods.map(mod => mod.workshopID);
 
     return (
