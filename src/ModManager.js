@@ -66,10 +66,7 @@ const ModManager = () => {
         setEditMod(mod); // Open editor for selected mod
         setIsNewMod(false); // Editing existing mod
 
-        // Log the mod being edited
-        console.log("Editing mod:", mod); 
-    
-        // Ensure all fields are filled in correctly
+        // Ensure all fields are filled in correctly, especially modName
         setModName(mod.modName || ''); // This should set the modName correctly
         setWorkshopID(mod.workshopID || '');
         setModID(mod.modID || '');
@@ -77,7 +74,6 @@ const ModManager = () => {
         setRequirements(mod.requirements || '');
         setModSource(mod.modSource || '');
         setModEnabled(mod.modEnabled || true);
-        setEditIndex(mod.editIndex || null); // Assuming editIndex is part of the mod object
     };
 
     const handleAddOrEditMod = (updatedMod) => {
