@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 
 const ModEditor = ({ mod, onSave, onCancel, scrapedData }) => {
-    const [modName, setModName] = useState(mod.modName || '');
-    const [workshopID, setWorkshopID] = useState(mod.workshopID || '');
-    const [modID, setModID] = useState(mod.modID || '');
-    const [mapFolder, setMapFolder] = useState(mod.mapFolder || '');
-    const [requirements, setRequirements] = useState(mod.requirements || '');
-    const [modSource, setModSource] = useState(mod.modSource || '');
-    const [modEnabled, setModEnabled] = useState(mod.modEnabled || false);
+    const [modName, setModName] = useState(mod?.modName || '');
+    const [workshopID, setWorkshopID] = useState(mod?.workshopID || '');
+    const [modID, setModID] = useState(mod?.modID || '');
+    const [mapFolder, setMapFolder] = useState(mod?.mapFolder || '');
+    const [requirements, setRequirements] = useState(mod?.requirements || '');
+    const [modSource, setModSource] = useState(mod?.modSource || '');
+    const [modEnabled, setModEnabled] = useState(mod?.modEnabled || false);
 
     // If scrapedData is available, use it to populate fields
     useEffect(() => {
@@ -26,12 +26,12 @@ const ModEditor = ({ mod, onSave, onCancel, scrapedData }) => {
             modSource,
             modEnabled,
         };
-        onSave(updatedMod);
+        onSave(mod ? { ...mod, ...updatedMod } : updatedMod);
     };
 
     return (
         <div>
-            <h3>{modName ? 'Edit Mod' : 'Add New Mod'}</h3>
+            <h3>{mod ? 'Edit Mod' : 'Add New Mod'}</h3>
             <form>
                 <input
                     type="text"

@@ -2,7 +2,6 @@ import React, { useState, useContext } from 'react';
 import { ModContext } from './ModContext';
 import { ipcRenderer } from 'electron';
 import FileOperations from './FileOperations';
-import ModEditor from './ModEditor';
 import ModListItem from './ModListItem';
 import ModForm from './ModForm';
 import Scraper from './Scraper';
@@ -76,17 +75,14 @@ const ModManager = () => {
         setEditIndex(mod.editIndex || null); // Assuming editIndex is part of the mod object
     };
 
-    const handleAddNewMod = () => {
-        resetFields(); // Reset fields to start fresh
-        setIsNewMod(true); // Indicate it's a new mod being added
-    };
-
-    const handleSaveMod = (updatedMod) => {
-        if (!updatedMod.modName || !updatedMod.workshopID) {
-            alert('Mod Name and Workshop ID are required.');
-            return;
+    const handleAddOrEditMod = (updatedMod) => {
+        if (editMod) {
+            const modToUpdate = { ...editMod, ...updatedMod }; // If editing, update the existing mod
+            addOrEditMod(modToUpdate);
+        } else {
+            addOrEditMod(updatedMod); // If adding a new mod, simply add it
         }
-        addOrEditMod(updatedMod);
+        resetFields(); // Reset the mod fields after adding/editing
         setEditMod(null); // Close editor after saving
         setIsNewMod(false); // Reset the "Add New" flag
         setScrapedData(null); // Clear scraped data after saving
@@ -95,6 +91,12 @@ const ModManager = () => {
     const handleCancelEdit = () => {
         setEditMod(null); // Close editor without saving
         setIsNewMod(false); // Reset the "Add New" flag
+    };
+
+    const clearMods = () => {
+        if (window.confirm('Are you sure you want to clear the mods list?')) {
+            setMods([]);
+        }
     };
 
     const handleScrapeSteamData = async () => {
@@ -107,22 +109,6 @@ const ModManager = () => {
         }
     };
 
-    const clearMods = () => {
-        if (window.confirm('Are you sure you want to clear the mods list?')) {
-            setMods([]);
-        }
-    };
-
-    const handleAddOrEditMod = (mod) => {
-        if (editMod) {
-            const updatedMod = { ...editMod, ...mod }; // If editing, update the existing mod
-            addOrEditMod(updatedMod);
-        } else {
-            addOrEditMod(mod); // If adding a new mod, simply add it
-        }
-        resetFields(); // Reset the mod fields after adding/editing
-    };
-
     return (
         <div>
             <h1>Mod Manager</h1>
@@ -130,9 +116,6 @@ const ModManager = () => {
 
             {/* Mod List */}
             <ModListItem mods={mods} onEdit={handleEditMod} removeMod={removeMod} />
-
-            {/* Add New Mod Button */}
-            <button onClick={handleAddNewMod}>Add New Mod</button>
 
             {/* File Operations (Load/Save mods from files) */}
             <FileOperations
@@ -142,19 +125,7 @@ const ModManager = () => {
                 saveModsToIniFile={saveModsToIniFile}
             />
 
-            {/* Mod Editor Section */}
-            {editMod ? (
-                <ModEditor mod={editMod} onSave={handleSaveMod} onCancel={handleCancelEdit} scrapedData={scrapedData} />
-            ) : (
-                <div>Select a mod to edit or add a new one</div>
-            )}
-
-            <button onClick={clearMods}>Clear Mods List</button>
-
-            <button onClick={() => setShowScraper(!showScraper)}>
-                {showScraper ? 'Hide Scraper' : 'Show Scraper'}
-            </button>
-
+            {/* Mod Form for Adding or Editing Mod */}
             <ModForm
                 modName={modName}
                 setModName={setModName}
@@ -171,8 +142,14 @@ const ModManager = () => {
                 modEnabled={modEnabled}
                 setModEnabled={setModEnabled}
                 handleAddOrEditMod={handleAddOrEditMod}
-                editIndex={editIndex}
+                resetFields={resetFields} // Pass resetFields here
             />
+
+            <button onClick={clearMods}>Clear Mods List</button>
+
+            <button onClick={() => setShowScraper(!showScraper)}>
+                {showScraper ? 'Hide Scraper' : 'Show Scraper'}
+            </button>
 
             {showScraper && <Scraper setModName={setModName} setWorkshopID={setWorkshopID} setModID={setModID} setMapFolder={setMapFolder} />}
         </div>
