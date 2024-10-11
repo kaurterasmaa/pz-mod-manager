@@ -6,7 +6,6 @@ import ModEditor from './ModEditor';
 import ModListItem from './ModListItem';
 import ModForm from './ModForm';
 import Scraper from './Scraper';
-import useModDataModel from './ModDataModel';
 
 const ModManager = () => {
     const { mods, setMods, addOrEditMod, removeMod } = useContext(ModContext);
@@ -15,28 +14,26 @@ const ModManager = () => {
     const [scrapedData, setScrapedData] = useState(null); // Store scraped Steam data
     const [showScraper, setShowScraper] = useState(false); // State to control Scraper visibility
 
-    // Use the custom hook to get mod data state
-    const {
-        modName,
-        setModName,
-        workshopID,
-        setWorkshopID,
-        modID,
-        setModID,
-        mapFolder,
-        setMapFolder,
-        requirements,
-        setRequirements,
-        modSource,
-        setModSource,
-        modEnabled,
-        setModEnabled,
-        editIndex,
-        setEditIndex,
-        resetFields,
-        getMod,
-        setMod,
-    } = useModDataModel();
+    // State handling for mod fields
+    const [modName, setModName] = useState('');
+    const [workshopID, setWorkshopID] = useState('');
+    const [modID, setModID] = useState('');
+    const [mapFolder, setMapFolder] = useState('');
+    const [requirements, setRequirements] = useState('');
+    const [modSource, setModSource] = useState('');
+    const [modEnabled, setModEnabled] = useState(true);
+    const [editIndex, setEditIndex] = useState(null);
+
+    const resetFields = () => {
+        setModName('');
+        setWorkshopID('');
+        setModID('');
+        setMapFolder('');
+        setRequirements('');
+        setModSource('');
+        setModEnabled(true);
+        setEditIndex(null);
+    };
 
     const loadModsFromFile = async (filePath) => {
         const modsList = await ipcRenderer.invoke('load-mods-custom', filePath);
@@ -69,8 +66,14 @@ const ModManager = () => {
     const handleEditMod = (mod) => {
         setEditMod(mod); // Open editor for selected mod
         setIsNewMod(false); // Editing existing mod
-        setMod(mod); // Set mod data in the hook
-        setEditIndex(mod.editIndex); // Assuming editIndex is part of the mod object
+        setModName(mod.modName || '');
+        setWorkshopID(mod.workshopID || '');
+        setModID(mod.modID || '');
+        setMapFolder(mod.mapFolder || '');
+        setRequirements(mod.requirements || '');
+        setModSource(mod.modSource || '');
+        setModEnabled(mod.modEnabled || true);
+        setEditIndex(mod.editIndex || null); // Assuming editIndex is part of the mod object
     };
 
     const handleAddNewMod = () => {
@@ -111,16 +114,14 @@ const ModManager = () => {
     };
 
     const handleAddOrEditMod = (mod) => {
-    if (editMod) {
-        // If editing, update the existing mod
-        const updatedMod = { ...editMod, ...mod };
-        addOrEditMod(updatedMod);
-    } else {
-        // If adding a new mod, simply add it
-        addOrEditMod(mod);
-    }
-    resetModFields(); // Assuming you have a function to reset the mod fields
-};
+        if (editMod) {
+            const updatedMod = { ...editMod, ...mod }; // If editing, update the existing mod
+            addOrEditMod(updatedMod);
+        } else {
+            addOrEditMod(mod); // If adding a new mod, simply add it
+        }
+        resetFields(); // Reset the mod fields after adding/editing
+    };
 
     return (
         <div>

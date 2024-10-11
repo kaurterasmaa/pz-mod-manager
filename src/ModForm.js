@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
+import useModDataModel from './ModDataModel';
 
-const ModForm = ({
-    modName, setModName,
-    workshopID, setWorkshopID,
-    modID, setModID,
-    mapFolder, setMapFolder,
-    requirements, setRequirements,
-    modSource, setModSource,
-    modEnabled, setModEnabled,
-    handleAddOrEditMod,
-    editIndex
-}) => {
+const ModForm = ({ handleAddOrEditMod, editIndex }) => {
+    const {
+        modName, setModName,
+        workshopID, setWorkshopID,
+        modID, setModID,
+        mapFolder, setMapFolder,
+        requirements, setRequirements,
+        modSource, setModSource,
+        modEnabled, setModEnabled,
+        resetFields
+    } = useModDataModel();
+
     const [errors, setErrors] = useState({});
 
     const validateForm = () => {
@@ -23,9 +25,10 @@ const ModForm = ({
     const handleSubmit = () => {
         const validationErrors = validateForm();
         if (Object.keys(validationErrors).length === 0) {
-            handleAddOrEditMod();  // Call parent function to add/edit mod
+            handleAddOrEditMod();
+            resetFields();
         } else {
-            setErrors(validationErrors);  // Set validation errors
+            setErrors(validationErrors);
         }
     };
 
