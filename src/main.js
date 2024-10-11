@@ -49,8 +49,8 @@ ipcMain.handle('load-mods-ini', async (_, filePath) => {
     return loadModsIni(filePath);
 });
 
-ipcMain.handle('save-mods-ini', async (_, workshopIDs, filePath) => {
-    return saveModsIni(workshopIDs, filePath);
+ipcMain.handle('save-mods-ini', async (_, modList, filePath) => {
+    return saveModsIni(modList, filePath);
 });
 
 ipcMain.handle('dialog:openIniFile', async () => {

@@ -104,7 +104,7 @@ const ModForm = ({
                 </label>
             </div>
 
-            <button onClick={handleAddOrEditMod}>
+            <button onClick={handleSubmit}>
                 {editIndex !== null ? 'Save Changes' : 'Add Mod'}
             </button>
         </div>

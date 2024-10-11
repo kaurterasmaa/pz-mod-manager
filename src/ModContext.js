@@ -6,15 +6,22 @@ export const ModContext = createContext();
 export const ModProvider = ({ children }) => {
     const [mods, setMods] = useState([]);
     const [editIndex, setEditIndex] = useState(null);
+    const [filePath, setFilePath] = useState(null);  // Add filePath state
     const [error, setError] = useState(null);  // Error handling
     const [filePath, setFilePath] = useState(null);  // Store file path
 
     // Function to load mods from file
     const loadMods = async () => {
         try {
+<<<<<<< HEAD
             const { modsListItem, path } = await ipcRenderer.invoke('load-mods'); // Expect path from the response
             setMods(modsListItem);
             setFilePath(path); // Store the file path
+=======
+            const modsList = await ipcRenderer.invoke('load-mods');
+            setMods(modsList);
+            setFilePath(modsList.filePath || null); // Set filePath if available from loaded mods
+>>>>>>> f4e22c611599c205328553b17402a955aa13ae16
             setError(null);  // Clear error if loading is successful
         } catch (error) {
             console.error('Error loading mods:', error);
@@ -31,8 +38,15 @@ export const ModProvider = ({ children }) => {
         }
 
         try {
+<<<<<<< HEAD
             await ipcRenderer.invoke('save-mods-custom', modListItem, filePath); // Use the stored filePath
             setError(null);  // Clear error on successful save
+=======
+            if (!filePath) {
+                throw new Error('filePath is not defined');
+            }
+            await ipcRenderer.invoke('save-mods-custom', modList, filePath); // Ensure filePath is passed here
+>>>>>>> f4e22c611599c205328553b17402a955aa13ae16
         } catch (error) {
             console.error('Error saving mods:', error);
             throw error; // Propagate the error
@@ -65,11 +79,21 @@ export const ModProvider = ({ children }) => {
         await saveMods(updatedMods);  // Save mods after adding/editing
     };
 
-    // Function to remove a mod by workshopID
     const removeMod = async (workshopID) => {
         const updatedMods = mods.filter(mod => mod.workshopID !== workshopID);
         setMods(updatedMods);
-        await saveMods(updatedMods);
+    
+        // Check if filePath is valid before saving
+        if (filePath) {
+            try {
+                await saveMods(updatedMods);
+            } catch (error) {
+                console.error('Error saving mods after removal:', error);
+            }
+        } else {
+            console.warn('File path is not set. Mods will not be saved to file.');
+            setError('File path is not defined. Please set a file path before saving mods.');
+        }
     };
 
     // Automatically load mods on component mount
@@ -85,6 +109,7 @@ export const ModProvider = ({ children }) => {
             removeMod,
             editIndex, 
             setEditIndex,
+            setFilePath,  // Add setFilePath to context
             error,  // Provide error state to children for UI feedback
         }}>
             {children}

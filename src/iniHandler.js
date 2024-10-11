@@ -19,10 +19,25 @@ function loadModsIni(filePath) {
     });
 }
 
-function saveModsIni(workshopIDs, filePath) {
+function saveModsIni(modList, filePath) {
     return new Promise((resolve, reject) => {
-        const workshopLine = `WorkshopItems=${workshopIDs.join(';')}\n`;
-        fs.writeFile(filePath, workshopLine, (err) => {
+        // Construct the WorkshopItems= line
+        const workshopLine = `WorkshopItems=${modList.map(mod => mod.workshopID).join(';')}`;
+
+        // Construct the Mods= line
+        const modsLine = `Mods=${modList.map(mod => mod.modID).join(';')}`;
+
+        // Construct the Map= line, only include mods that have a mapFolder
+        const mapLine = `Map=${modList
+            .filter(mod => mod.mapFolder) // Filter out mods without mapFolder
+            .map(mod => mod.mapFolder)
+            .join(';')}`;
+
+        // Combine the lines into the .ini content
+        const iniContent = `${workshopLine}\n${modsLine}\n${mapLine}\n`;
+
+        // Write the content to the .ini file
+        fs.writeFile(filePath, iniContent, (err) => {
             if (err) {
                 reject(err);
             } else {
