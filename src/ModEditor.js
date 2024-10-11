@@ -1,18 +1,38 @@
 import React, { useState, useEffect } from 'react';
 
 const ModEditor = ({ mod, onSave, onCancel, scrapedData }) => {
-    const [modName, setModName] = useState(mod?.modName || '');
-    const [workshopID, setWorkshopID] = useState(mod?.workshopID || '');
-    const [modID, setModID] = useState(mod?.modID || '');
-    const [mapFolder, setMapFolder] = useState(mod?.mapFolder || '');
-    const [requirements, setRequirements] = useState(mod?.requirements || '');
-    const [modSource, setModSource] = useState(mod?.modSource || '');
-    const [modEnabled, setModEnabled] = useState(mod?.modEnabled || false);
+    const [modName, setModName] = useState('');
+    const [workshopID, setWorkshopID] = useState('');
+    const [modID, setModID] = useState('');
+    const [mapFolder, setMapFolder] = useState('');
+    const [requirements, setRequirements] = useState('');
+    const [modSource, setModSource] = useState('');
+    const [modEnabled, setModEnabled] = useState(false);
+
+    // Effect to set initial values based on the mod being edited
+    useEffect(() => {
+        if (mod) {
+            setModName(mod.modName || '');
+            setWorkshopID(mod.workshopID || '');
+            setModID(mod.modID || '');
+            setMapFolder(mod.mapFolder || '');
+            setRequirements(mod.requirements || '');
+            setModSource(mod.modSource || '');
+            setModEnabled(mod.modEnabled || false);
+        }
+    }, [mod]); // Run this effect when the mod changes
 
     // If scrapedData is available, use it to populate fields
     useEffect(() => {
         if (scrapedData) {
             setModName(scrapedData.title);
+            // You can set other fields here as well, if desired
+            setWorkshopID(scrapedData.workshopID || '');
+            setModID(scrapedData.modID || '');
+            setMapFolder(scrapedData.mapFolder || '');
+            setRequirements(scrapedData.requirements || '');
+            setModSource(scrapedData.modSource || '');
+            setModEnabled(scrapedData.modEnabled || false);
         }
     }, [scrapedData]);
 

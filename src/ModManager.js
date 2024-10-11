@@ -65,7 +65,12 @@ const ModManager = () => {
     const handleEditMod = (mod) => {
         setEditMod(mod); // Open editor for selected mod
         setIsNewMod(false); // Editing existing mod
-        setModName(mod.modName || '');
+
+        // Log the mod being edited
+        console.log("Editing mod:", mod); 
+    
+        // Ensure all fields are filled in correctly
+        setModName(mod.modName || ''); // This should set the modName correctly
         setWorkshopID(mod.workshopID || '');
         setModID(mod.modID || '');
         setMapFolder(mod.mapFolder || '');
