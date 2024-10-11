@@ -4,13 +4,39 @@ import { ipcRenderer } from 'electron';
 import FileOperations from './FileOperations';
 import ModEditor from './ModEditor';
 import ModListItem from './ModListItem';
+import ModForm from './ModForm';
+import Scraper from './Scraper';
+import useModDataModel from './ModDataModel';
 
 const ModManager = () => {
     const { mods, setMods, addOrEditMod, removeMod } = useContext(ModContext);
     const [editMod, setEditMod] = useState(null); // Mod being edited
     const [isNewMod, setIsNewMod] = useState(false); // Track if new mod is being added
     const [scrapedData, setScrapedData] = useState(null); // Store scraped Steam data
-    const [workshopID, setWorkshopID] = useState(''); // Store workshop ID input
+    const [showScraper, setShowScraper] = useState(false); // State to control Scraper visibility
+
+    // Use the custom hook to get mod data state
+    const {
+        modName,
+        setModName,
+        workshopID,
+        setWorkshopID,
+        modID,
+        setModID,
+        mapFolder,
+        setMapFolder,
+        requirements,
+        setRequirements,
+        modSource,
+        setModSource,
+        modEnabled,
+        setModEnabled,
+        editIndex,
+        setEditIndex,
+        resetFields,
+        getMod,
+        setMod,
+    } = useModDataModel();
 
     const loadModsFromFile = async (filePath) => {
         const modsList = await ipcRenderer.invoke('load-mods-custom', filePath);
@@ -43,10 +69,12 @@ const ModManager = () => {
     const handleEditMod = (mod) => {
         setEditMod(mod); // Open editor for selected mod
         setIsNewMod(false); // Editing existing mod
+        setMod(mod); // Set mod data in the hook
+        setEditIndex(mod.editIndex); // Assuming editIndex is part of the mod object
     };
 
     const handleAddNewMod = () => {
-        setEditMod({ modName: '', workshopID: '', modID: '', mapFolder: '', requirements: '', modSource: '', modEnabled: false });
+        resetFields(); // Reset fields to start fresh
         setIsNewMod(true); // Indicate it's a new mod being added
     };
 
@@ -76,6 +104,24 @@ const ModManager = () => {
         }
     };
 
+    const clearMods = () => {
+        if (window.confirm('Are you sure you want to clear the mods list?')) {
+            setMods([]);
+        }
+    };
+
+    const handleAddOrEditMod = (mod) => {
+    if (editMod) {
+        // If editing, update the existing mod
+        const updatedMod = { ...editMod, ...mod };
+        addOrEditMod(updatedMod);
+    } else {
+        // If adding a new mod, simply add it
+        addOrEditMod(mod);
+    }
+    resetModFields(); // Assuming you have a function to reset the mod fields
+};
+
     return (
         <div>
             <h1>Mod Manager</h1>
@@ -102,23 +148,32 @@ const ModManager = () => {
                 <div>Select a mod to edit or add a new one</div>
             )}
 
-            {/* Steam Workshop Scraper */}
-            <h3>Steam Workshop Scraper</h3>
-            <input
-                type="text"
-                placeholder="Enter Workshop ID"
-                value={workshopID}
-                onChange={(e) => setWorkshopID(e.target.value)}
-            />
-            <button onClick={handleScrapeSteamData}>Scrape Steam Data</button>
+            <button onClick={clearMods}>Clear Mods List</button>
 
-            {/* Display Scraped Data */}
-            {scrapedData && (
-                <div>
-                    <p>Title: {scrapedData.title}</p>
-                    <p>Description: {scrapedData.description}</p>
-                </div>
-            )}
+            <button onClick={() => setShowScraper(!showScraper)}>
+                {showScraper ? 'Hide Scraper' : 'Show Scraper'}
+            </button>
+
+            <ModForm
+                modName={modName}
+                setModName={setModName}
+                workshopID={workshopID}
+                setWorkshopID={setWorkshopID}
+                modID={modID}
+                setModID={setModID}
+                mapFolder={mapFolder}
+                setMapFolder={setMapFolder}
+                requirements={requirements}
+                setRequirements={setRequirements}
+                modSource={modSource}
+                setModSource={setModSource}
+                modEnabled={modEnabled}
+                setModEnabled={setModEnabled}
+                handleAddOrEditMod={handleAddOrEditMod}
+                editIndex={editIndex}
+            />
+
+            {showScraper && <Scraper setModName={setModName} setWorkshopID={setWorkshopID} setModID={setModID} setMapFolder={setMapFolder} />}
         </div>
     );
 };
