@@ -1,73 +1,105 @@
-import React, { useState } from 'react';
-const { ipcRenderer } = require('electron');
+import React, { useState, useContext } from 'react';
+import { ModContext } from './ModContext';
+import { ipcRenderer } from 'electron';
+import FileOperations from './FileOperations';
+import ModEditor from './ModEditor';
+import ModListItem from './ModListItem';
+import Scraper from './Scraper'; // Ensure this line is present
 
-const Scraper = ({ setModName, setWorkshopID, setModID, setMapFolder }) => {
-    const [workshopID, setWorkshopIDInput] = useState('');
-    const [scrapedData, setScrapedData] = useState({ title: '', description: '' });
-    const [error, setError] = useState(null);
+const ModManager = () => {
+    const { mods, setMods, addOrEditMod, removeMod } = useContext(ModContext);
+    const [editMod, setEditMod] = useState(null);
+    const [isNewMod, setIsNewMod] = useState(false);
+    const [scrapedData, setScrapedData] = useState(null);
+    const [workshopID, setWorkshopID] = useState('');
+    const [modName, setModName] = useState('');
+    const [modID, setModID] = useState('');
+    const [mapFolder, setMapFolder] = useState('');
+    const [errorMessage, setErrorMessage] = useState(null);
+    const [loading, setLoading] = useState(false);
 
-    // Function to trigger the scrape
-    const scrapeSteamPage = async () => {
-        try {
-            const data = await ipcRenderer.invoke('scrape-steam-page', workshopID);
-            if (data.error) {
-                setError(data.error);
-            } else {
-                setScrapedData(data);
-                setError(null);
-            }
-        } catch (err) {
-            setError('Error scraping Steam page');
-            console.error(err);
+    const loadModsFromFile = async (filePath) => {
+        const modsList = await ipcRenderer.invoke('load-mods-custom', filePath);
+        setMods(modsList);
+    };
+
+    const saveModsToFile = async (filePath) => {
+        if (!filePath) {
+            alert('Please select a file to save.');
+            return;
         }
+        await ipcRenderer.invoke('save-mods-custom', mods, filePath);
     };
 
-    // Function to extract mod details from the description
-    const extractModDetails = (description) => {
-        const workshopIDMatch = description.match(/Workshop ID:\s*(\d+)/);
-        const modIDMatch = description.match(/Mod ID:\s*(\S+)/);
-        const mapFolderMatch = description.match(/Map Folder:\s*(\S+)/);
-
-        return {
-            workshopID: workshopIDMatch ? workshopIDMatch[1] : '',
-            modID: modIDMatch ? modIDMatch[1] : '',
-            mapFolder: mapFolderMatch ? mapFolderMatch[1] : '',
-        };
+    const loadModsFromIniFile = async (filePath) => {
+        const workshopIDs = await ipcRenderer.invoke('load-mods-ini', filePath);
+        const iniModsList = workshopIDs.map((id) => ({ workshopID: id, modName: `Mod-${id}` }));
+        setMods(iniModsList);
     };
 
-    // Function to inject scraped data into ModForm
-    const injectModDetails = () => {
-        const { title, description } = scrapedData;
-        const { workshopID, modID, mapFolder } = extractModDetails(description);
+    const saveModsToIniFile = async (filePath) => {
+        if (!filePath) {
+            alert('Please select a file to save.');
+            return;
+        }
+        const workshopIDs = mods.map((mod) => mod.workshopID);
+        await ipcRenderer.invoke('save-mods-ini', workshopIDs, filePath);
+    };
 
-        setModName(title); // Set the scraped title as the mod name
-        setWorkshopID(workshopID); // Set the extracted Workshop ID
-        setModID(modID); // Set the extracted Mod ID
-        setMapFolder(mapFolder); // Set the extracted Map Folder
+    const handleEditMod = (mod) => {
+        setEditMod(mod);
+        setIsNewMod(false);
+    };
+
+    const handleAddNewMod = () => {
+        setEditMod({ modName: '', workshopID: '', modID: '', mapFolder: '', requirements: '', modSource: '', modEnabled: false });
+        setIsNewMod(true);
+    };
+
+    const handleSaveMod = (updatedMod) => {
+        if (!updatedMod.modName || !updatedMod.workshopID) {
+            alert('Mod Name and Workshop ID are required.');
+            return;
+        }
+        addOrEditMod(updatedMod);
+        setEditMod(null);
+        setIsNewMod(false);
+        setScrapedData(null);
+    };
+
+    const handleCancelEdit = () => {
+        setEditMod(null);
+        setIsNewMod(false);
     };
 
     return (
         <div>
-            <h2>Steam Workshop Scraper</h2>
-            <input
-                type="text"
-                placeholder="Enter Workshop ID"
-                value={workshopID}
-                onChange={(e) => setWorkshopIDInput(e.target.value)}
+            <h1>Mod Manager</h1>
+            {errorMessage && <p className="error">{errorMessage}</p>}
+            {loading && <p>Loading...</p>}
+            <p>Number of Mods Loaded: {mods.length}</p>
+            <ModListItem mods={mods} onEdit={handleEditMod} removeMod={removeMod} />
+            <button onClick={handleAddNewMod}>Add New Mod</button>
+            <FileOperations
+                loadModsFromFile={loadModsFromFile}
+                saveModsToFile={saveModsToFile}
+                loadModsFromIniFile={loadModsFromIniFile}
+                saveModsToIniFile={saveModsToIniFile}
             />
-            <button onClick={scrapeSteamPage}>Scrape Workshop Page</button>
-
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            {scrapedData.title && (
-                <div>
-                    <h3>Scraped Data</h3>
-                    <p><strong>Title:</strong> {scrapedData.title}</p>
-                    <p><strong>Description:</strong> {scrapedData.description}</p>
-                    <button onClick={injectModDetails}>Inject Mod Details</button>
-                </div>
+            {editMod ? (
+                <ModEditor mod={editMod} onSave={handleSaveMod} onCancel={handleCancelEdit} scrapedData={scrapedData} />
+            ) : (
+                <div>Select a mod to edit or add a new one</div>
             )}
+            {/* The Scraper component is now always visible without duplication */}
+            <Scraper 
+                setModName={setModName} 
+                setWorkshopID={setWorkshopID}
+                setModID={setModID} 
+                setMapFolder={setMapFolder} 
+            />
         </div>
     );
 };
 
-export default Scraper;
+export default ModManager;

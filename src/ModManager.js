@@ -7,13 +7,10 @@ import ModListItem from './ModListItem';
 
 const ModManager = () => {
     const { mods, setMods, addOrEditMod, removeMod } = useContext(ModContext);
-    const [editMod, setEditMod] = useState(null);
-    const [isNewMod, setIsNewMod] = useState(false);
-    const [scrapedData, setScrapedData] = useState(null);
-    const [workshopID, setWorkshopID] = useState('');
-    const [errorMessage, setErrorMessage] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [showScraper, setShowScraper] = useState(false);
+    const [editMod, setEditMod] = useState(null); // Mod being edited
+    const [isNewMod, setIsNewMod] = useState(false); // Track if new mod is being added
+    const [scrapedData, setScrapedData] = useState(null); // Store scraped Steam data
+    const [workshopID, setWorkshopID] = useState(''); // Store workshop ID input
 
     const loadModsFromFile = async (filePath) => {
         const modsList = await ipcRenderer.invoke('load-mods-custom', filePath);
@@ -44,13 +41,13 @@ const ModManager = () => {
     };
 
     const handleEditMod = (mod) => {
-        setEditMod(mod);
-        setIsNewMod(false);
+        setEditMod(mod); // Open editor for selected mod
+        setIsNewMod(false); // Editing existing mod
     };
 
     const handleAddNewMod = () => {
         setEditMod({ modName: '', workshopID: '', modID: '', mapFolder: '', requirements: '', modSource: '', modEnabled: false });
-        setIsNewMod(true);
+        setIsNewMod(true); // Indicate it's a new mod being added
     };
 
     const handleSaveMod = (updatedMod) => {
@@ -59,14 +56,14 @@ const ModManager = () => {
             return;
         }
         addOrEditMod(updatedMod);
-        setEditMod(null);
-        setIsNewMod(false);
-        setScrapedData(null);
+        setEditMod(null); // Close editor after saving
+        setIsNewMod(false); // Reset the "Add New" flag
+        setScrapedData(null); // Clear scraped data after saving
     };
 
     const handleCancelEdit = () => {
-        setEditMod(null);
-        setIsNewMod(false);
+        setEditMod(null); // Close editor without saving
+        setIsNewMod(false); // Reset the "Add New" flag
     };
 
     const handleScrapeSteamData = async () => {
@@ -82,22 +79,30 @@ const ModManager = () => {
     return (
         <div>
             <h1>Mod Manager</h1>
-            {errorMessage && <p className="error">{errorMessage}</p>}
-            {loading && <p>Loading...</p>}
             <p>Number of Mods Loaded: {mods.length}</p>
+
+            {/* Mod List */}
             <ModListItem mods={mods} onEdit={handleEditMod} removeMod={removeMod} />
+
+            {/* Add New Mod Button */}
             <button onClick={handleAddNewMod}>Add New Mod</button>
+
+            {/* File Operations (Load/Save mods from files) */}
             <FileOperations
                 loadModsFromFile={loadModsFromFile}
                 saveModsToFile={saveModsToFile}
                 loadModsFromIniFile={loadModsFromIniFile}
                 saveModsToIniFile={saveModsToIniFile}
             />
+
+            {/* Mod Editor Section */}
             {editMod ? (
                 <ModEditor mod={editMod} onSave={handleSaveMod} onCancel={handleCancelEdit} scrapedData={scrapedData} />
             ) : (
                 <div>Select a mod to edit or add a new one</div>
             )}
+
+            {/* Steam Workshop Scraper */}
             <h3>Steam Workshop Scraper</h3>
             <input
                 type="text"
@@ -105,11 +110,15 @@ const ModManager = () => {
                 value={workshopID}
                 onChange={(e) => setWorkshopID(e.target.value)}
             />
-            <button onClick={() => setShowScraper(!showScraper)}>
-                {showScraper ? 'Hide Scraper' : 'Show Scraper'}
-            </button>
             <button onClick={handleScrapeSteamData}>Scrape Steam Data</button>
-            {showScraper && <Scraper setModName={setModName} setWorkshopID={setWorkshopID} setModID={setModID} setMapFolder={setMapFolder} />}
+
+            {/* Display Scraped Data */}
+            {scrapedData && (
+                <div>
+                    <p>Title: {scrapedData.title}</p>
+                    <p>Description: {scrapedData.description}</p>
+                </div>
+            )}
         </div>
     );
 };
