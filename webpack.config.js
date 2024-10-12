@@ -16,6 +16,13 @@ module.exports = {
         use: {
           loader: 'babel-loader'
         }
+      },
+      {
+        test: /\.css$/, // Add this rule to handle CSS files
+        use: [
+          'style-loader', // Inject CSS into the DOM
+          'css-loader'    // Translates CSS into CommonJS
+        ]
       }
     ]
   },
