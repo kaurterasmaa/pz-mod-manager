@@ -113,16 +113,20 @@ const ModManager = () => {
         <div className="mod-manager-container">
             {/* Left section */}
             <div className="left-section">
-                <h1>Mod Manager</h1>
-                <p>Number of Mods Loaded: {mods.length}</p>
+                {/* Fixed header area */}
+                <div className="header">
+                    <h1>Mod Manager</h1>
+                    <p>Number of Mods Loaded: {mods.length}</p>
+                </div>
 
-                {/* Mod List */}
-                <ModListItem mods={mods} onEdit={handleEditMod} removeMod={removeMod} />
+                {/* Scrollable mod list */}
+                <div className="mod-list-container">
+                    <ModListItem mods={mods} onEdit={handleEditMod} removeMod={removeMod} />
+                </div>
             </div>
 
             {/* Right section */}
             <div className="right-section">
-                {/* File Operations (Load/Save mods from files) */}
                 <FileOperations
                     loadModsFromFile={loadModsFromFile}
                     saveModsToFile={saveModsToFile}
@@ -130,7 +134,6 @@ const ModManager = () => {
                     saveModsToIniFile={saveModsToIniFile}
                 />
 
-                {/* Mod Form for Adding or Editing Mod */}
                 <ModForm
                     modName={modName}
                     setModName={setModName}
@@ -160,6 +163,7 @@ const ModManager = () => {
             </div>
         </div>
     );
+
 };
 
 export default ModManager;

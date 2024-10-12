@@ -8,17 +8,29 @@
 .left-section, .right-section {
     width: 45%;
     padding: 20px;
-    box-sizing: border-box; /* Ensure padding is included in the width */
-    overflow-y: auto; /* Enable vertical scroll */
+    box-sizing: border-box;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
 
 .left-section {
+    display: flex;
+    flex-direction: column;
     margin-right: 10px;
 }
 
+.header {
+    flex-shrink: 0; /* Ensure the header is not resized */
+}
+
+.mod-list-container {
+    flex-grow: 1;
+    overflow-y: auto; /* Scrollable mod list area */
+    margin-top: 10px; /* Space between header and list */
+}
+
 .right-section {
+    overflow-y: auto; /* Right section scrolls independently */
     margin-left: 10px;
 }
 
@@ -26,5 +38,5 @@ html, body {
     margin: 0;
     padding: 0;
     height: 100%;
-    overflow: hidden; /* Prevent the body from scrolling */
+    overflow: hidden;
 }
