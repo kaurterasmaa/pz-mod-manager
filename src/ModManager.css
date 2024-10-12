@@ -1,16 +1,30 @@
 .mod-manager-container {
     display: flex;
     justify-content: space-between;
+    height: 100vh; /* Full viewport height */
     padding: 20px;
 }
 
-.left-section {
+.left-section, .right-section {
     width: 45%;
-    border-right: 1px solid #ccc;
-    padding-right: 20px;
+    padding: 20px;
+    box-sizing: border-box; /* Ensure padding is included in the width */
+    overflow-y: auto; /* Enable vertical scroll */
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.left-section {
+    margin-right: 10px;
 }
 
 .right-section {
-    width: 45%;
-    padding-left: 20px;
+    margin-left: 10px;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; /* Prevent the body from scrolling */
 }
