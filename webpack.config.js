@@ -7,7 +7,7 @@ module.exports = {
     path: path.resolve(__dirname, 'dist'),
     filename: 'bundle.js'
   },
-  target: 'electron-renderer', // Add this line to set the target for Electron
+  target: 'electron-renderer',
   module: {
     rules: [
       {
@@ -18,7 +18,7 @@ module.exports = {
         }
       },
       {
-        test: /\.css$/, // Add this rule to handle CSS files
+        test: /\.css$/,
         use: [
           'style-loader', // Inject CSS into the DOM
           'css-loader'    // Translates CSS into CommonJS
@@ -28,7 +28,7 @@ module.exports = {
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './src/index.html',  // This is your source index.html file
+      template: './src/index.html',
     })
   ],
   resolve: {

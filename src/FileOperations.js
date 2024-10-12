@@ -3,7 +3,7 @@ import { ipcRenderer } from 'electron';
 
 const FileOperations = ({ loadModsFromFile, saveModsToFile, loadModsFromIniFile, saveModsToIniFile }) => {
     const defaultSaveFolder = './saves';
-    const [filePath, setFilePath] = useState(null); // State to track the file path
+    const [filePath, setFilePath] = useState(null);
 
     const ensureSaveFolderExists = () => {
         const fs = window.require('fs');
@@ -18,7 +18,7 @@ const FileOperations = ({ loadModsFromFile, saveModsToFile, loadModsFromIniFile,
             const { filePath } = await ipcRenderer.invoke('dialog:saveJsonFile');
 
             if (filePath) {
-                setFilePath(filePath); // Update filePath state
+                setFilePath(filePath);
                 await saveModsToFile(filePath);
             }
         } catch (error) {
@@ -32,7 +32,7 @@ const FileOperations = ({ loadModsFromFile, saveModsToFile, loadModsFromIniFile,
             const { filePath } = await ipcRenderer.invoke('dialog:openJsonFile');
 
             if (filePath) {
-                setFilePath(filePath); // Update filePath state
+                setFilePath(filePath);
                 await loadModsFromFile(filePath);
             }
         } catch (error) {
@@ -46,7 +46,7 @@ const FileOperations = ({ loadModsFromFile, saveModsToFile, loadModsFromIniFile,
             const { filePath } = await ipcRenderer.invoke('dialog:saveIniFile');
 
             if (filePath) {
-                setFilePath(filePath); // Update filePath state
+                setFilePath(filePath);
                 await saveModsToIniFile(filePath);
             }
         } catch (error) {
@@ -60,7 +60,7 @@ const FileOperations = ({ loadModsFromFile, saveModsToFile, loadModsFromIniFile,
             const { filePath } = await ipcRenderer.invoke('dialog:openIniFile');
 
             if (filePath) {
-                setFilePath(filePath); // Update filePath state
+                setFilePath(filePath);
                 await loadModsFromIniFile(filePath);
             }
         } catch (error) {
@@ -78,7 +78,7 @@ const FileOperations = ({ loadModsFromFile, saveModsToFile, loadModsFromIniFile,
             <button onClick={handleLoadModsFromIniFile}>Load Mods from INI File</button>
             <button onClick={handleSaveModsToIniFile}>Save Mods to INI File</button>
 
-            {filePath && <p>Current File: {filePath}</p>} {/* Display the current file path */}
+            {filePath && <p>Last File: {filePath}</p>}
         </div>
     );
 };
