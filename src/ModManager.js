@@ -117,21 +117,17 @@ const ModManager = () => {
 
     return (
         <div className="mod-manager-container">
-            {/* Left section */}
             <div className="left-section">
-                {/* Fixed header area */}
                 <div className="header">
                     <h1>Mod Manager</h1>
                     <p>Number of Mods Loaded: {mods.length}</p>
                 </div>
 
-                {/* Scrollable mod list */}
                 <div className="mod-list-container">
-                    <ModListItem mods={mods} onEdit={handleEditMod} removeMod={removeMod} />
+                    <ModListItem mods={mods} onEdit={handleEditMod} removeMod={removeMod} editMod={editMod} />
                 </div>
             </div>
 
-            {/* Right section */}
             <div className="right-section">
                 <FileOperations
                     loadModsFromFile={loadModsFromFile}

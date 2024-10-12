@@ -1,7 +1,6 @@
 import React from 'react';
 
-const ModListItem = ({ mods, onEdit, removeMod }) => {  // Change handleEdit to onEdit
-    // Create a list of all workshop IDs from saved mods
+const ModListItem = ({ mods, onEdit, removeMod, editMod }) => {  
     const savedWorkshopIDs = mods.map(mod => mod.workshopID);
 
     return (
@@ -9,7 +8,16 @@ const ModListItem = ({ mods, onEdit, removeMod }) => {  // Change handleEdit to 
             <h2>Installed Mods</h2>
             <ul>
                 {mods.map((mod, index) => (
-                    <li key={mod.workshopID}>
+                    <li 
+                        key={mod.workshopID} 
+                        style={{
+                            backgroundColor: editMod && editMod.workshopID === mod.workshopID ? 'lightblue' : 'inherit',
+                            padding: '10px',
+                            marginBottom: '5px',
+                            border: '1px solid #ccc',
+                            borderRadius: '5px'
+                        }}
+                    >
                         <strong>{mod.modName || mod.name}</strong>
                         <p>Workshop ID: {mod.workshopID}</p>
                         <p>Mod ID: {mod.modID}</p>
@@ -45,7 +53,7 @@ const ModListItem = ({ mods, onEdit, removeMod }) => {  // Change handleEdit to 
                             View on Steam
                         </a>
                         <div>
-                            <button onClick={() => onEdit(mod)}>Edit</button> {/* Pass the whole mod object instead of index */}
+                            <button onClick={() => onEdit(mod)}>Edit</button>
                             <button onClick={() => removeMod(mod.workshopID)}>Remove</button>
                         </div>
                         <p>Enabled: {mod.modEnabled ? 'Yes' : 'No'}</p>
