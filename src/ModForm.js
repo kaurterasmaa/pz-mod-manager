@@ -20,7 +20,7 @@ const ModForm = ({
 }) => {
     return (
         <div>
-            <h3>{modName ? 'Edit Mod' : 'Add New Mod'}</h3> {/* This should stay as is */}
+            <h3>{modName ? 'Edit Mod' : 'Add New Mod'}</h3>
             <form onSubmit={(e) => {
                 e.preventDefault();
                 handleAddOrEditMod({
@@ -78,9 +78,9 @@ const ModForm = ({
                         onChange={(e) => setModEnabled(e.target.checked)}
                     />
                 </label>
-                <button type="submit">Save</button> {/* Added a save button here */}
+                <button type="submit">Save</button>
             </form>
-            <button onClick={resetFields}>Cancel</button> {/* Resetting fields can also be tied to this button */}
+            <button onClick={resetFields}>Cancel</button>
         </div>
     );
 };

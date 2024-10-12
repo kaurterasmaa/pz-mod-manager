@@ -5,7 +5,7 @@ import FileOperations from './FileOperations';
 import ModListItem from './ModListItem';
 import ModForm from './ModForm';
 import Scraper from './Scraper';
-import './ModManager.css'; // Import your styles here
+import './ModManager.css';
 
 const ModManager = () => {
     const { mods, setMods, addOrEditMod, removeMod } = useContext(ModContext);
@@ -59,8 +59,14 @@ const ModManager = () => {
             alert('Please select a file to save.');
             return;
         }
-        const workshopIDs = mods.map((mod) => mod.workshopID);
-        await ipcRenderer.invoke('save-mods-ini', workshopIDs, filePath);
+    
+        try {
+            const workshopIDs = mods.map((mod) => mod.workshopID);
+            await ipcRenderer.invoke('save-mods-ini', mods, filePath);
+            console.log('INI file saving triggered');
+        } catch (error) {
+            console.error('Error saving INI file:', error);
+        }
     };
 
     const handleEditMod = (mod) => {

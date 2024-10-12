@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const { loadModsJson, saveModsJson } = require('./jsonHandler');
 const { loadModsIni, saveModsIni } = require('./iniHandler');
+const fs = require('fs');
 
 let mainWindow;
 
@@ -13,16 +14,15 @@ ipcMain.handle('save-mods-custom', async (_, modList, filePath) => {
     return saveModsJson(modList, filePath);
 });
 
-ipcMain.handle('save-mods', async (_, modList, filePath) => { // Ensure filePath is passed here
+ipcMain.handle('save-mods', async (_, modList, filePath) => {
     try {
-        await saveModsJson(modList, filePath); // Save mods with the given filePath
-        return true; // Indicate success
+        await saveModsJson(modList, filePath);
+        return true;
     } catch (error) {
         console.error('Error saving mods:', error);
-        throw error; // Propagate the error
+        throw error;
     }
 });
-
 
 // Dialog Handlers
 ipcMain.handle('dialog:openJsonFile', async () => {
@@ -49,8 +49,27 @@ ipcMain.handle('load-mods-ini', async (_, filePath) => {
     return loadModsIni(filePath);
 });
 
-ipcMain.handle('save-mods-ini', async (_, modList, filePath) => {
-    return saveModsIni(modList, filePath);
+ipcMain.handle('save-mods-ini', async (event, mods, filePath) => {
+    try {
+        if (!filePath || !mods) {
+            throw new Error('Invalid file path or mods data');
+        }
+
+        // Debugging logs to see what mods and filePath look like
+        console.log('Saving INI file to path:', filePath);
+        console.log('Mods data:', mods);
+
+        // Prepare INI data format
+        let iniData = `WorkshopItems=${mods.map(mod => mod.workshopID).join(';')}\n`;
+        iniData += `Mods=${mods.map(mod => mod.modID).join(';')}\n`;
+        iniData += `Map=${mods.map(mod => mod.mapFolder).join(';')}\n`;
+
+        // Write INI data to the file
+        fs.writeFileSync(filePath, iniData);
+        console.log('INI file saved successfully');
+    } catch (error) {
+        console.error('Failed to save INI file:', error);
+    }
 });
 
 ipcMain.handle('dialog:openIniFile', async () => {
