@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 const { ipcRenderer } = require('electron');
 
-const Scraper = ({ setModName, setWorkshopID, setModID, setMapFolder }) => {
+const Scraper = ({ setModName, setWorkshopID, setModID, setMapFolder, setRequirements }) => {
     const [workshopID, setWorkshopIDInput] = useState('');
-    const [scrapedData, setScrapedData] = useState({ title: '', description: '' });
+    const [scrapedData, setScrapedData] = useState({ title: '', description: '', requiredItems: [] }); // Initialize requiredItems as an empty array
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
 
@@ -15,7 +15,7 @@ const Scraper = ({ setModName, setWorkshopID, setModID, setMapFolder }) => {
             if (data.error) {
                 setError(data.error);
             } else {
-                setScrapedData(data);
+                setScrapedData(data); // Use the full data response including required items
             }
         } catch (err) {
             setError('Error scraping Steam page');
@@ -38,13 +38,14 @@ const Scraper = ({ setModName, setWorkshopID, setModID, setMapFolder }) => {
     };
 
     const injectModDetails = () => {
-        const { title, description } = scrapedData;
+        const { title, description, requiredItems } = scrapedData;
         const { workshopID, modID, mapFolder } = extractModDetails(description);
 
         setModName(title);
         setWorkshopID(workshopID);
         setModID(modID);
         setMapFolder(mapFolder);
+        setRequirements(requiredItems.map(item => item.workshopID).join('; ')); // Set requirements as a semicolon-separated string
     };
 
     return (
@@ -66,6 +67,16 @@ const Scraper = ({ setModName, setWorkshopID, setModID, setMapFolder }) => {
                     <h3>Scraped Data</h3>
                     <p><strong>Title:</strong> {scrapedData.title}</p>
                     <p><strong>Description:</strong> {scrapedData.description}</p>
+                    <h4>Required Items</h4>
+                    <ul>
+                        {scrapedData.requiredItems.map(item => (
+                            <li key={item.workshopID}>
+                                <a href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${item.workshopID}`} target="_blank" rel="noopener noreferrer">
+                                    {item.name}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
                     <button onClick={injectModDetails}>Inject Mod Details</button>
                 </div>
             )}

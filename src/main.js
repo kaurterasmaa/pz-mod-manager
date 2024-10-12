@@ -110,7 +110,17 @@ const scrapeSteamWorkshopPage = async (workshopID) => {
         (function() {
             const title = document.querySelector('.workshopItemTitle')?.innerText || 'No title found';
             const description = document.querySelector('.workshopItemDescription')?.innerText || 'No description found';
-            return { title, description };
+
+            // Extract required items
+            const requiredItemsContainer = document.querySelector('.requiredItemsContainer');
+            const requiredItems = Array.from(requiredItemsContainer?.querySelectorAll('a'))
+                .map(item => {
+                    const workshopID = item.href.match(/id=(\\d+)/)?.[1]; // Extract workshopID from URL
+                    const name = item.querySelector('.requiredItem')?.innerText.trim() || 'No name found';
+                    return { workshopID, name };
+                }) || [];
+
+            return { title, description, requiredItems };
         })();
     `);
 

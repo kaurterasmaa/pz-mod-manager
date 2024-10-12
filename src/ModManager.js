@@ -19,7 +19,7 @@ const ModManager = () => {
     const [workshopID, setWorkshopID] = useState('');
     const [modID, setModID] = useState('');
     const [mapFolder, setMapFolder] = useState('');
-    const [requirements, setRequirements] = useState('');
+    const [requirements, setRequirements] = useState(''); // Make sure to include this line
     const [modSource, setModSource] = useState('');
     const [modEnabled, setModEnabled] = useState(true);
     const [editIndex, setEditIndex] = useState(null);
@@ -29,7 +29,7 @@ const ModManager = () => {
         setWorkshopID('');
         setModID('');
         setMapFolder('');
-        setRequirements('');
+        setRequirements(''); // Reset requirements here as well
         setModSource('');
         setModEnabled(true);
         setEditIndex(null);
@@ -115,7 +115,7 @@ const ModManager = () => {
         }
     };
 
-    return (
+   return (
         <div className="mod-manager-container">
             <div className="left-section">
                 <div className="header">
@@ -146,7 +146,7 @@ const ModManager = () => {
                     mapFolder={mapFolder}
                     setMapFolder={setMapFolder}
                     requirements={requirements}
-                    setRequirements={setRequirements}
+                    setRequirements={setRequirements} // Pass setRequirements here
                     modSource={modSource}
                     setModSource={setModSource}
                     modEnabled={modEnabled}
@@ -161,11 +161,18 @@ const ModManager = () => {
                     {showScraper ? 'Hide Scraper' : 'Show Scraper'}
                 </button>
 
-                {showScraper && <Scraper setModName={setModName} setWorkshopID={setWorkshopID} setModID={setModID} setMapFolder={setMapFolder} />}
+                {showScraper && (
+                    <Scraper 
+                        setModName={setModName} 
+                        setWorkshopID={setWorkshopID} 
+                        setModID={setModID} 
+                        setMapFolder={setMapFolder} 
+                        setRequirements={setRequirements} // Pass setRequirements here
+                    />
+                )}
             </div>
         </div>
     );
-
 };
 
 export default ModManager;
