@@ -62,7 +62,9 @@ ipcMain.handle('save-mods-ini', async (event, mods, filePath) => {
         // Prepare INI data format
         let iniData = `WorkshopItems=${mods.map(mod => mod.workshopID).join(';')}\n`;
         iniData += `Mods=${mods.map(mod => mod.modID).join(';')}\n`;
-        iniData += `Map=${mods.map(mod => mod.mapFolder).join(';')}\n`;
+
+        // Only include mods that have a mapFolder for the Map= line
+        iniData += `Map=${mods.filter(mod => mod.mapFolder).map(mod => mod.mapFolder).join(';')}\n`;
 
         // Write INI data to the file
         fs.writeFileSync(filePath, iniData);
