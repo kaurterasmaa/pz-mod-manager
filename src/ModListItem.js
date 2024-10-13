@@ -57,7 +57,7 @@ const ModListItem = ({ mods, onEdit, removeMod, editMod }) => {
                                         >
                                             {reqID}
                                         </a>
-                                        {i < mod.requirements.split(';').length - 1 && '; '}
+                                        {i < mod.requirements.split(';').length - 1 && ';'}
                                     </span>
                                 );
                             })
