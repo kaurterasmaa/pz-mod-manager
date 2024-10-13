@@ -82,16 +82,24 @@ const ModManager = () => {
     };
 
     const handleAddOrEditMod = (updatedMod) => {
-        if (editMod) {
-            const modToUpdate = { ...editMod, ...updatedMod };
-            addOrEditMod(modToUpdate);
+        // Check if the mod exists by workshopID
+        const existingModIndex = mods.findIndex((mod) => mod.workshopID === updatedMod.workshopID);
+
+        if (existingModIndex !== -1) {
+            // If editing an existing mod, update that mod
+            const modToUpdate = { ...mods[existingModIndex], ...updatedMod };
+            const updatedMods = [...mods];
+            updatedMods[existingModIndex] = modToUpdate;
+            setMods(updatedMods);
         } else {
-            addOrEditMod(updatedMod);
+            // If adding a new mod, push it to the mods list
+            setMods([...mods, updatedMod]);
         }
+
         resetFields();
-        setEditMod(null);
-        setIsNewMod(false);
-        setScrapedData(null);
+        setEditMod(null); // Clear the editing state
+        setIsNewMod(false); // Reset the new mod state
+        setScrapedData(null); // Reset scraped data
     };
 
     const handleCancelEdit = () => {
