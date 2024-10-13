@@ -12,7 +12,7 @@ const ModListItem = ({ mods, onEdit, removeMod, editMod }) => {
         <div>
             <h2>Installed Mods</h2>
             <ul>
-                {mods.map((mod, index) => (
+                {mods.map((mod) => (
                     <li 
                         key={mod.workshopID} 
                         style={{
@@ -24,12 +24,19 @@ const ModListItem = ({ mods, onEdit, removeMod, editMod }) => {
                         }}
                     >
                         <strong>{mod.modName || mod.name}</strong>
-                        <p 
-                            onContextMenu={() => handleRightClick(mod.workshopID)} // Right-click on mod's workshop ID
-                            style={{ cursor: 'pointer', color: 'blue' }}
-                        >
-                            Workshop ID: {mod.workshopID}
+
+                        <p>
+                            <a 
+                                href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${mod.workshopID}`} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                onContextMenu={() => handleRightClick(mod.workshopID)} // Right-click on Workshop ID
+                                style={{ cursor: 'pointer', color: 'blue', textDecoration: 'underline' }}
+                            >
+                                Workshop ID: {mod.workshopID}
+                            </a>
                         </p>
+
                         <p>Mod ID: {mod.modID}</p>
 
                         <p style={{ backgroundColor: mod.mapFolder ? 'lightgreen' : 'inherit', padding: '2px 5px' }}>
@@ -56,13 +63,6 @@ const ModListItem = ({ mods, onEdit, removeMod, editMod }) => {
                             })
                         }</p>
 
-                        <a 
-                            href={`https://steamcommunity.com/sharedfiles/filedetails/?id=${mod.workshopID}`} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                        >
-                            View on Steam
-                        </a>
                         <div>
                             <button onClick={() => onEdit(mod)}>Edit</button>
                             <button onClick={() => removeMod(mod.workshopID)}>Remove</button>
