@@ -1,9 +1,22 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, clipboard, Menu, MenuItem } = require('electron');
 const { loadModsJson, saveModsJson } = require('./jsonHandler');
 const { loadModsIni, saveModsIni } = require('./iniHandler');
 const fs = require('fs');
 
 let mainWindow;
+
+// IPC handler for creating context menu and copying text
+ipcMain.on('show-context-menu', (event, workshopID) => {
+    const menu = new Menu();
+    menu.append(new MenuItem({
+        label: 'Copy Workshop ID',
+        click: () => {
+            clipboard.writeText(workshopID); // Copy workshopID to clipboard
+            console.log(`Workshop ID ${workshopID} copied to clipboard`);
+        }
+    }));
+    menu.popup(BrowserWindow.fromWebContents(event.sender));
+});
 
 // JSON Handling
 ipcMain.handle('load-mods-custom', async (_, filePath) => {
