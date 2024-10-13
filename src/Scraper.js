@@ -45,7 +45,7 @@ const Scraper = ({ setModName, setWorkshopID, setModID, setMapFolder, setRequire
         setWorkshopID(workshopID);
         setModID(modID);
         setMapFolder(mapFolder);
-        setRequirements(requiredItems.map(item => item.workshopID).join('; ')); // Set requirements as a semicolon-separated string
+        setRequirements(requiredItems.map(item => item.workshopID).join(';')); // Set requirements as a semicolon-separated string
     };
 
     return (
