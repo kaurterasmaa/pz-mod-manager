@@ -81,11 +81,19 @@ const ModManager = () => {
         setModEnabled(mod.modEnabled || true);
     };
 
-    const handleAddOrEditMod = (updatedMod) => {
+    const handleAddOrEditMod = async (updatedMod) => {
         // Check if the mod exists by workshopID
         const existingModIndex = mods.findIndex((mod) => mod.workshopID === updatedMod.workshopID);
 
         if (existingModIndex !== -1) {
+            // If a mod with the same workshopID exists, prompt for confirmation
+            const shouldOverwrite = await ipcRenderer.invoke('confirm-overwrite', updatedMod.workshopID);
+        
+            if (!shouldOverwrite) {
+                // If the user chose not to overwrite, exit the function
+                return;
+            }
+
             // If editing an existing mod, update that mod
             const modToUpdate = { ...mods[existingModIndex], ...updatedMod };
             const updatedMods = [...mods];

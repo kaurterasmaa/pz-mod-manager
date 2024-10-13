@@ -5,6 +5,17 @@ const fs = require('fs');
 
 let mainWindow;
 
+// IPC handler for confirmation dialog
+ipcMain.handle('confirm-overwrite', async (event, workshopID) => {
+    const result = await dialog.showMessageBox(mainWindow, {
+        type: 'warning',
+        buttons: ['Cancel', 'Overwrite'],
+        title: 'Confirmation',
+        message: `A mod with Workshop ID ${workshopID} already exists. Do you want to overwrite it?`
+    });
+    return result.response === 1; // Return true if the user clicked 'Overwrite'
+});
+
 // IPC handler for creating context menu and copying text
 ipcMain.on('show-context-menu', (event, workshopID) => {
     const menu = new Menu();
@@ -27,9 +38,25 @@ ipcMain.handle('save-mods-custom', async (_, modList, filePath) => {
     return saveModsJson(modList, filePath);
 });
 
-ipcMain.handle('save-mods', async (_, modList, filePath) => {
+ipcMain.handle('save-mods', async (event, modList, newMod) => {
     try {
-        await saveModsJson(modList, filePath);
+        // Check if the new mod's workshopID already exists in the modList
+        const existingMod = modList.find(mod => mod.workshopID === newMod.workshopID);
+        if (existingMod) {
+            // Prompt for confirmation
+            const confirmation = await dialog.showMessageBox(mainWindow, {
+                type: 'warning',
+                buttons: ['Cancel', 'Overwrite'],
+                title: 'Confirm Overwrite',
+                message: `A mod with Workshop ID ${newMod.workshopID} already exists. Do you want to overwrite it?`,
+            });
+            if (confirmation.response === 0) {
+                // If the user clicked 'Cancel', don't save
+                return false;
+            }
+        }
+
+        await saveModsJson(modList, newMod.filePath);
         return true;
     } catch (error) {
         console.error('Error saving mods:', error);
